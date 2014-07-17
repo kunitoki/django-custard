@@ -2,6 +2,8 @@
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.base import ModelBase
+from django.db.models.loading import get_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -12,23 +14,57 @@ from .utils import import_class
 
 
 #==============================================================================
-DEFAULT_VALIDATOR_VALUE = """
-## Custom validator function here
-#def validator(value, instance=None):
-#    #raise Exception("Invalid value")
-#    pass
-"""
+class AlreadyRegistered(Exception):
+    pass
+
+class NotRegistered(Exception):
+    pass
 
 
 #==============================================================================
-class CustomContentType:
+class CustomContentType(object):
 
-    @staticmethod
-    def create_fields(valid_content_types=Q(), base_model=models.Model):
+    def __init__(self):
+        self._registry = {}
+
+    def register(self, model_or_iterable):
+        """
+        Registers the given model(s) with the given admin class.
+
+        The model(s) should be Model classes, not instances.
+
+        If a model is already registered, this will raise AlreadyRegistered.
+
+        If a model is abstract, this will raise ImproperlyConfigured.
+        """
+
+        if isinstance(model_or_iterable, ModelBase):
+            model_or_iterable = [model_or_iterable]
+        for model in model_or_iterable:
+            if model in self._registry:
+                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+            self._registry[model] = ContentType.objects.get_for_model(model).model
+
+    def unregister(self, model_or_iterable):
+        """
+        Unregisters the given model(s).
+
+        If a model isn't already registered, this will raise NotRegistered.
+        """
+        if isinstance(model_or_iterable, ModelBase):
+            model_or_iterable = [model_or_iterable]
+        for model in model_or_iterable:
+            if model not in self._registry:
+                raise NotRegistered('The model %s is not registered' % model.__name__)
+            del self._registry[model]
+
+    def create_fields(self, base_model=models.Model, valid_content_types=None):
         """
         This method will create a model which will hold field types defined
         at runtime for each ContentType.
         """
+        
+        # generic class
         class CustomContentTypeField(base_model):
             DATATYPE_CHOICES = (
                 (CUSTOM_TYPE_TEXT,     _('text')),
@@ -40,7 +76,7 @@ class CustomContentType:
                 (CUSTOM_TYPE_BOOLEAN,  _('boolean')),
             )
         
-            VALID_CONTENT_TYPES = valid_content_types
+            VALID_CONTENT_TYPES = valid_content_types or { 'name__in': self._registry.values() }
         
             content_type = models.ForeignKey(ContentType,
                                              related_name='custom_fields',
@@ -65,23 +101,21 @@ class CustomContentType:
                 abstract = True
         
             def save(self, *args, **kwargs):
-                if self.required:
-                    # TODO - must create values for all instances that have not
-                    model = self.content_type.model_class()
-                    print model.objects.values_list('pk', flat=True)
-                    print self.field.filter(content_type=self.content_type)
-                    objs = self.field.filter(content_type=self.content_type) \
-                                     .exclude(object_id__in=model.objects.values_list('pk', flat=True))
-                    for obj in objs:
-                        print obj
                 super(CustomContentTypeField, self).save(*args, **kwargs)
         
             def validate_unique(self, exclude=None):
+                # HACK - workaround django bug https://code.djangoproject.com/ticket/17582
                 try:
-                    # HACK - workaround django bug https://code.djangoproject.com/ticket/17582
                     ct = self.content_type
                 except:
                     raise ValidationError({ NON_FIELD_ERRORS: (_('The content type has not been specified'),) })
+                
+                # field name already defined in Model class
+                model = self.content_type.model_class()
+                if self.name in [f.name for f in model._meta.fields]:
+                    raise ValidationError({ 'name': (_('Custom field already defined for content type %(model_name)s') % {'model_name': model.__name__},) })
+
+                # field name already defined in custom fields for content type
                 qs = self.__class__._default_manager.filter(
                     content_type=self.content_type,
                     name=self.name,
@@ -89,7 +123,17 @@ class CustomContentType:
                 if not self._state.adding and self.pk is not None:
                     qs = qs.exclude(pk=self.pk)
                 if qs.exists():
-                    raise ValidationError({ NON_FIELD_ERRORS: (_('The content type instance already has this field'),) })
+                    raise ValidationError({ 'name': (_('Custom field already defined content type %(model_name)s') % {'model_name': model.__name__},) })
+
+                # if field is required must issue a initial value
+                if self.required:
+                    # TODO - must create values for all instances that have not
+                    print model.objects.values_list('pk', flat=True)
+                    print self.field.filter(content_type=self.content_type)
+                    objs = self.field.filter(content_type=self.content_type) \
+                                     .exclude(object_id__in=model.objects.values_list('pk', flat=True))
+                    for obj in objs:
+                        print obj
         
             def get_form_field(self):
                 field_attrs = {
@@ -132,10 +176,7 @@ class CustomContentType:
 
         return CustomContentTypeField
 
-
-    @staticmethod
-    def create_values(custom_field_model,
-                      base_model=models.Model):
+    def create_values(self, custom_field_model, base_model=models.Model):
         """
         This method will create a model which will hold field values for
         field types of custom_field_model.
@@ -191,31 +232,36 @@ class CustomContentType:
     
         return CustomContentTypeFieldValue
 
+    def create_manager(self, fields_model, values_model):
+        """
+        """
+        fields_model = fields_model.split(".")
+        values_model = values_model.split(".")
+        
+        class CustomManager(models.Manager):
+            def get_fields_model(self):
+                return get_model(fields_model[0], fields_model[1])
+        
+            def get_values_model(self):
+                return get_model(values_model[0], values_model[1])
+        
+            def search(self, search_data, custom_args={}):
+                q = Q()
+                content_type = ContentType.objects.get_for_model(self.model)
+                custom_args = dict({ 'content_type': content_type, 'searchable': True }, **custom_args)
+                custom = dict((s.name, s) for s in self.get_fields_model().objects.filter(**custom_args))
+                for key, custom_field in custom.items():
+                    value_lookup = 'value_text' # TODO - search in other field types (not only text)
+                    value_lookup = '%s__%s' % (value_lookup, 'icontains')
+                    found = self.get_values_model().objects.filter(**{ 'custom_field': custom_field,
+                                                                       'content_type': content_type,
+                                                                       value_lookup: search_data })
+                    if found.count() > 0:
+                        q = q & Q(**{ str('%s__in' % (self.model._meta.pk.name)): [f.object_id for f in found] })
+                return self.get_queryset().filter(q)
+                
+        return CustomManager()
+        
 
 #==============================================================================
-class CustomQ:
-    """
-    Bastract class that simulates the usage of Q objects when building complex
-    queries that need to touch custom fields too.
-    """
-
-    def get_fields_model(self):
-        raise NotImplementedError
-
-    def get_values_model(self):
-        raise NotImplementedError
-
-    def query(self, model, search_data, custom_args={}):
-        q = Q()
-        content_type = ContentType.objects.get_for_model(model)
-        custom_args = dict({ 'content_type': content_type, 'searchable': True }, **custom_args)
-        custom = dict((s.name, s) for s in self.get_fields_model().objects.filter(**custom_args))
-        for key, custom_field in custom.items():
-            value_lookup = 'value_text' # TODO - search in other field types (not only text)
-            value_lookup = '%s__%s' % (value_lookup, 'icontains')
-            found = self.get_values_model().objects.filter(**{ 'custom_field': custom_field,
-                                                               'content_type': content_type,
-                                                               value_lookup: search_data })
-            q = q & Q(**{ str('%s__in' % (model._meta.pk.name)): [f.object_id for f in found] })
-        return q
-
+custom = CustomContentType()

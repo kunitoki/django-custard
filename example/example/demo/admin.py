@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
-
 from custard.forms import CustomFieldModelBaseForm
 
 from example.demo.models import Example, CustomFieldsModel, CustomValuesModel
+
+# Register your models here.
 
 class ExampleForm(CustomFieldModelBaseForm):
 
@@ -26,15 +26,27 @@ class ExampleForm(CustomFieldModelBaseForm):
 
     class Meta:
         model = Example
-        
+
 
 class ExampleAdmin(admin.ModelAdmin):
     form = ExampleForm
+    search_fields = ('name',)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super(ExampleAdmin, self).get_search_results(request, queryset, search_term)
+        try:
+            queryset |= self.model.custom.search(search_term)
+        except:
+            pass
+        return queryset, use_distinct
+
 admin.site.register(Example, ExampleAdmin)
+
 
 class CustomFieldsModelAdmin(admin.ModelAdmin):
     pass
 admin.site.register(CustomFieldsModel, CustomFieldsModelAdmin)
+
 
 class CustomValuesModelAdmin(admin.ModelAdmin):
     pass
