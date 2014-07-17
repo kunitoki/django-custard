@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-from django import forms
 from django.db import models
 from django.db.models import Q
-from django.contrib.admin import widgets
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.translation import ugettext_lazy as _
+
+from .conf import *
+from .utils import import_class
 
 
 #==============================================================================
@@ -24,49 +24,31 @@ DEFAULT_VALIDATOR_VALUE = """
 class CustomContentType:
 
     @staticmethod
-    def create_fields(valid_custom_content_types=Q(), base_model=models.Model):
+    def create_fields(valid_content_types=Q(), base_model=models.Model):
         """
         This method will create a model which will hold field types defined
         at runtime for each ContentType.
         """
         class CustomContentTypeField(base_model):
-            TYPE_TEXT     = 'text'
-            TYPE_INTEGER  = 'integer'
-            TYPE_FLOAT    = 'float'
-            TYPE_TIME     = 'time'
-            TYPE_DATE     = 'date'
-            TYPE_DATETIME = 'datetime'
-            TYPE_BOOLEAN  = 'boolean'
-        
             DATATYPE_CHOICES = (
-                (TYPE_TEXT,     _('text')),
-                (TYPE_INTEGER,  _('integer')),
-                (TYPE_FLOAT,    _('float')),
-                (TYPE_TIME,     _('time')),
-                (TYPE_DATE,     _('date')),
-                (TYPE_DATETIME, _('datetime')),
-                (TYPE_BOOLEAN,  _('boolean')),
+                (CUSTOM_TYPE_TEXT,     _('text')),
+                (CUSTOM_TYPE_INTEGER,  _('integer')),
+                (CUSTOM_TYPE_FLOAT,    _('float')),
+                (CUSTOM_TYPE_TIME,     _('time')),
+                (CUSTOM_TYPE_DATE,     _('date')),
+                (CUSTOM_TYPE_DATETIME, _('datetime')),
+                (CUSTOM_TYPE_BOOLEAN,  _('boolean')),
             )
         
-            FIELD_TYPES = {
-                TYPE_TEXT:     forms.CharField,
-                TYPE_INTEGER:  forms.IntegerField,
-                TYPE_FLOAT:    forms.FloatField,
-                TYPE_TIME:     forms.TimeField,
-                TYPE_DATE:     forms.DateField,
-                TYPE_DATETIME: forms.DateTimeField,
-                TYPE_BOOLEAN:  forms.BooleanField,
-            }
-            
-            VALID_CUSTOM_CONTENT_TYPES = valid_custom_content_types
+            VALID_CONTENT_TYPES = valid_content_types
         
             content_type = models.ForeignKey(ContentType,
                                              related_name='custom_fields',
                                              verbose_name=_('content type'),
-                                             limit_choices_to=VALID_CUSTOM_CONTENT_TYPES)
+                                             limit_choices_to=VALID_CONTENT_TYPES)
             name = models.CharField(_('name'), max_length=100, db_index=True)
             label = models.CharField(_('label'), max_length=100)
-            data_type = models.CharField(_('data type'), max_length=8, choices=DATATYPE_CHOICES)
+            data_type = models.CharField(_('data type'), max_length=8, choices=DATATYPE_CHOICES, db_index=True)
             help_text = models.CharField(_('help text'), max_length=200, blank=True, null=True)
             required = models.BooleanField(_('required'), default=False)
             searchable = models.BooleanField(_('searchable'), default=True)
@@ -75,8 +57,6 @@ class CustomContentType:
             max_length = models.PositiveIntegerField(_('max length'), blank=True, null=True)
             min_value = models.FloatField(_('min value'), blank=True, null=True)
             max_value = models.FloatField(_('max value'), blank=True, null=True)
-            #validator = code.PythonCodeField(_('validator'), blank=True, null=True,
-            #                                 default=DEFAULT_VALIDATOR_VALUE)
         
             class Meta:
                 #unique_together = ('content_type', 'name')
@@ -85,6 +65,15 @@ class CustomContentType:
                 abstract = True
         
             def save(self, *args, **kwargs):
+                if self.required:
+                    # TODO - must create values for all instances that have not
+                    model = self.content_type.model_class()
+                    print model.objects.values_list('pk', flat=True)
+                    print self.field.filter(content_type=self.content_type)
+                    objs = self.field.filter(content_type=self.content_type) \
+                                     .exclude(object_id__in=model.objects.values_list('pk', flat=True))
+                    for obj in objs:
+                        print obj
                 super(CustomContentTypeField, self).save(*args, **kwargs)
         
             def validate_unique(self, exclude=None):
@@ -108,7 +97,7 @@ class CustomContentType:
                     'help_text': self.help_text,
                     'required': self.required,
                 }
-                if self.data_type == CustomContentTypeField.TYPE_TEXT:
+                if self.data_type == CUSTOM_TYPE_TEXT:
                     #widget_attrs = {}
                     if self.min_length:
                         field_attrs['min_length'] = self.min_length
@@ -116,26 +105,26 @@ class CustomContentType:
                         field_attrs['max_length'] = self.max_length
                     #    widget_attrs['maxlength'] = self.max_length
                     #field_attrs['widget'] = widgets.AdminTextInputWidget(attrs=widget_attrs)
-                elif self.data_type == CustomContentTypeField.TYPE_INTEGER:
+                elif self.data_type == CUSTOM_TYPE_INTEGER:
                     if self.min_value: field_attrs['min_value'] = int(self.min_value)
                     if self.max_value: field_attrs['max_value'] = int(self.max_value)
                     #field_attrs['widget'] = spinner.IntegerSpinnerWidget(attrs=field_attrs)
-                elif self.data_type == CustomContentTypeField.TYPE_FLOAT:
+                elif self.data_type == CUSTOM_TYPE_FLOAT:
                     if self.min_value: field_attrs['min_value'] = float(self.min_value)
                     if self.max_value: field_attrs['max_value'] = float(self.max_value)
                     #field_attrs['widget'] = spinner.SpinnerWidget(attrs=field_attrs)
-                elif self.data_type == CustomContentTypeField.TYPE_TIME:
+                elif self.data_type == CUSTOM_TYPE_TIME:
                     #field_attrs['widget'] = date.TimePickerWidget()
                     pass
-                elif self.data_type == CustomContentTypeField.TYPE_DATE:
+                elif self.data_type == CUSTOM_TYPE_DATE:
                     #field_attrs['widget'] = date.DatePickerWidget()
                     pass
-                elif self.data_type == CustomContentTypeField.TYPE_DATETIME:
+                elif self.data_type == CUSTOM_TYPE_DATETIME:
                     #field_attrs['widget'] = date.DateTimePickerWidget()
                     pass
-                elif self.data_type == CustomContentTypeField.TYPE_BOOLEAN:
+                elif self.data_type == CUSTOM_TYPE_BOOLEAN:
                     pass
-                field_type = CustomContentTypeField.FIELD_TYPES[self.data_type]
+                field_type = import_class(CUSTOM_FIELD_TYPES[self.data_type])
                 return field_type(**field_attrs)
         
             def __unicode__(self):
@@ -152,10 +141,12 @@ class CustomContentType:
         field types of custom_field_model.
         """
         class CustomContentTypeFieldValue(base_model):
-            custom_field = models.ForeignKey(custom_field_model, verbose_name=_('custom field'))
+            custom_field = models.ForeignKey(custom_field_model,
+                                             verbose_name=_('custom field'),
+                                             related_name='field')
             content_type = models.ForeignKey(ContentType, editable=False,
                                              verbose_name=_('content type'),
-                                             limit_choices_to=custom_field_model.VALID_CUSTOM_CONTENT_TYPES)
+                                             limit_choices_to=custom_field_model.VALID_CONTENT_TYPES)
             object_id = models.PositiveIntegerField(_('object id'), db_index=True)
             content_object = generic.GenericForeignKey('content_type', 'object_id')
         
@@ -196,7 +187,7 @@ class CustomContentType:
                     raise ValidationError({ NON_FIELD_ERRORS: (_('A value for this custom field already exists'),) })
         
             def __unicode__(self):
-                return "%s" % (self.value)
+                return "%s(%s): %s" % (self.custom_field.name, self.object_id, self.value)
     
         return CustomContentTypeFieldValue
 
