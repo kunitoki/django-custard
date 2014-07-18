@@ -11,7 +11,7 @@ that implements runtime customizable fields that can be attached to any model
 on the fly: add your fields from the admin interface and display them in any
 model you want.
 
-.. |master| image:: https://travis-ci.org/kunitoki/django-custard.png?branch=master
+.. |travis| image:: https://travis-ci.org/kunitoki/django-custard.png?branch=master
    :alt: Build Status - master branch
    :target: https://travis-ci.org/kunitoki/django-custard
 
@@ -19,7 +19,7 @@ model you want.
 Licence
 -------
 
-* Django Suit is licensed under `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_ license.
+* Django Custard is licensed under `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_ license.
 
 
 Resources
@@ -29,7 +29,7 @@ Resources
 * Licence: https://github.com/kunitoki/django-custard/blob/master/LICENSE.txt
 * Demo app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/develop/CHANGELOG.rst>`_
-* Supports: Django 1.6. Python: 2.7 |master|
+* Supports: Django 1.6. Python: 2.7 |travis|
 
 
 
