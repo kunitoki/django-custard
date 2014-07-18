@@ -1,15 +1,16 @@
 from setuptools import setup
 
+VERSION = __import__('custard').VERSION
+
 setup(
     name='django-custard',
-    version=__import__('custard').VERSION,
+    version=VERSION,
     description='Django runtime generic customizable fields for any model.',
     author='Lucio Asnaghi (kunitoki)',
     author_email='kunitoki@gmail.com',
     url='https://github.com/kunitoki/django-custard',
-    packages=['custard'],
-    zip_safe=False,
-    include_package_data=True,
+    download_url='https://github.com/kunitoki/django-custard/releases/tag/%s' % VERSION,
+    keywords=['django', 'customfields'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Django',

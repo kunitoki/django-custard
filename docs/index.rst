@@ -27,7 +27,7 @@ Resources
 
 * Home page: https://github.com/kunitoki/django-custard
 * Licence: https://github.com/kunitoki/django-custard/blob/master/LICENSE.txt
-* Demo app on Github: https://github.com/kunitoki/django-custard/example
+* Example app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/develop/CHANGELOG.rst>`_
 * Supports: Django 1.6. Python: 2.7 |travis|
 
