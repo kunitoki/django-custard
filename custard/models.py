@@ -9,7 +9,10 @@ from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.translation import ugettext_lazy as _
 
-from .conf import *
+from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
+    CUSTOM_TYPE_TIME, CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME, CUSTOM_TYPE_BOOLEAN,
+    CUSTOM_FIELD_TYPES)
+
 from .utils import import_class
 
 
