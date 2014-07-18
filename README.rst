@@ -2,7 +2,7 @@
 django-custard
 ==============
 
-Django runtime generic customizable fields for any model
+**Django runtime generic customizable fields for any model**.
 
 .. |master| image:: https://travis-ci.org/kunitoki/django-custard.png?branch=master
    :alt: Build Status - master branch
