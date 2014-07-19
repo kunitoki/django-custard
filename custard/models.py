@@ -28,7 +28,19 @@ class NotRegistered(Exception):
 class CustomContentType(object):
 
     def __init__(self):
+        """
+        Constructor
+        """
         self._registry = {}
+
+
+    @property
+    def registry(self):
+        """
+        Property to get the internal registry
+        """
+        return self._registry
+
 
     def register(self, model_or_iterable):
         """
@@ -37,16 +49,14 @@ class CustomContentType(object):
         The model(s) should be Model classes, not instances.
 
         If a model is already registered, this will raise AlreadyRegistered.
-
-        If a model is abstract, this will raise ImproperlyConfigured.
         """
-
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
             self._registry[model] = ContentType.objects.get_for_model(model).model
+
 
     def unregister(self, model_or_iterable):
         """
@@ -60,6 +70,7 @@ class CustomContentType(object):
             if model not in self._registry:
                 raise NotRegistered('The model %s is not registered' % model.__name__)
             del self._registry[model]
+
 
     def create_fields(self, base_model=models.Model, valid_content_types=None):
         """
@@ -179,6 +190,7 @@ class CustomContentType(object):
 
         return CustomContentTypeField
 
+
     def create_values(self, custom_field_model, base_model=models.Model):
         """
         This method will create a model which will hold field values for
@@ -193,7 +205,7 @@ class CustomContentType(object):
                                              limit_choices_to=custom_field_model.VALID_CONTENT_TYPES)
             object_id = models.PositiveIntegerField(_('object id'), db_index=True)
             content_object = generic.GenericForeignKey('content_type', 'object_id')
-        
+
             value_text = models.TextField(blank=True, null=True)
             value_integer = models.IntegerField(blank=True, null=True)
             value_float = models.FloatField(blank=True, null=True)
@@ -235,8 +247,11 @@ class CustomContentType(object):
     
         return CustomContentTypeFieldValue
 
+
     def create_manager(self, fields_model, values_model):
         """
+        This will create the custom Manager that will use the fields_model and values_model
+        respectively.
         """
         fields_model = fields_model.split(".")
         values_model = values_model.split(".")

@@ -21,11 +21,11 @@ class CustomFieldModelBaseForm(forms.ModelForm):
         fields = self.get_fields_for_content_type(content_type)
         for f in fields:
             name = str(f.name)
+            initial = f.initial
             self.fields[name] = f.get_form_field()
             self.fields[name].is_custom = True
             self.fields[name].required = f.required
             self.fields[name].widget = self.get_widget_for_field(f.data_type)
-            initial = f.initial
             if self.instance and self.instance.pk:
                 value = self.search_value_for_field(f,
                                                     content_type,
@@ -66,13 +66,6 @@ class CustomFieldModelBaseForm(forms.ModelForm):
 
     def get_content_type(self):
         return ContentType.objects.get_for_model(self.get_model())
-
-    def get_model(self):
-        if not hasattr(self, 'Meta'):
-            raise Exception("Must define a Meta class in your form")
-        if not hasattr(self.Meta, 'model'):
-            raise Exception("Your form Meta class must define a model")
-        return self.Meta.model
 
     def get_widget_for_field(self, fieldtype, attrs={}):
         return import_class(CUSTOM_WIDGETS_TYPES[fieldtype])(**attrs)

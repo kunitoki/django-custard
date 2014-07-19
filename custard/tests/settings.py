@@ -1,5 +1,8 @@
 # Django settings for testproject project.
 
+import os
+DIRNAME = os.path.dirname(__file__)
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = True
@@ -10,9 +13,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(DIRNAME, 'db.sqlite3'),
+        'TEST_NAME': os.path.join(DIRNAME, 'testdb.sqlite3'),
     }
 }
-
 
 TIME_ZONE = 'Europe/Rome'
 LANGUAGE_CODE = 'en-us'

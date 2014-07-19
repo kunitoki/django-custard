@@ -43,12 +43,20 @@ CUSTOM_FIELD_TYPES
 It's possible to override which custom form fields are generated for each field type when the form is constructed::
 
   CUSTOM_FIELD_TYPES = {
-    'text':     'django.forms.CharField',
-    'integer':  'django.forms.IntegerField',
-    'float':    'django.forms.FloatField',
-    'time':     'django.forms.TimeField',
-    'date':     'django.forms.DateField',
-    'datetime': 'django.forms.DateTimeField',
-    'boolean':  'django.forms.BooleanField',
+    'text':     'app.forms.MySpecialCharField',
+    'integer':  'app.forms.AnotherIntegerField',
   }
+
+
+CUSTOM_WIDGETS_TYPES
+^^^^^^^^^^^^^^^^^^^^
+
+It's possible to override which custom form fields widgets are generated for each field type when the form is constructed::
+
+  CUSTOM_WIDGETS_TYPES = {
+    'time':     'app.forms.widgets.AdminTimeWidget',
+    'date':     'app.forms.widgets.AdminDateWidget',
+    'datetime': 'app.forms.widgets.AdminSplitDateTime',
+  }
+
 

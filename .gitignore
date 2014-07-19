@@ -7,19 +7,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-env/
-bin/
-build/
-develop-eggs/
-dist/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
 *.egg-info/
-.installed.cfg
 *.egg
 
 # Installer logs
@@ -42,9 +30,6 @@ coverage.xml
 .project
 .pydevproject
 
-# Rope
-.ropeproject
-
 # Django stuff:
 *.log
 *.pot
@@ -52,6 +37,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# sqlite
+# Sqlite3
 *.sqlite
 *.sqlite3
