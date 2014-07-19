@@ -14,7 +14,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(DIRNAME, 'db.sqlite3'),
-        'TEST_NAME': os.path.join(DIRNAME, 'testdb.sqlite3'),
+        'TEST_NAME': os.path.join(DIRNAME, 'test_db.sqlite3'),
     }
 }
 
@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'custard',
+    'custard.tests',
 )
 
 STATIC_URL = '/static/'

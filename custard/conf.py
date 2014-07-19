@@ -11,6 +11,9 @@ CUSTOM_TYPE_DATETIME = 'datetime'
 CUSTOM_TYPE_BOOLEAN  = 'boolean'
 
 
+CUSTOM_CONTENT_TYPES = getattr(settings, 'CUSTOM_CONTENT_TYPES', None)
+
+
 CUSTOM_FIELD_TYPES = {
     CUSTOM_TYPE_TEXT:     'django.forms.CharField',
     CUSTOM_TYPE_INTEGER:  'django.forms.IntegerField',

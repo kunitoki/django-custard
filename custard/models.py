@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
     CUSTOM_TYPE_TIME, CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME, CUSTOM_TYPE_BOOLEAN,
-    CUSTOM_FIELD_TYPES)
+    CUSTOM_CONTENT_TYPES, CUSTOM_FIELD_TYPES)
 
 from .utils import import_class
 
@@ -25,59 +25,27 @@ class NotRegistered(Exception):
 
 
 #==============================================================================
+CONTENT_TYPES = Q()
+if CUSTOM_CONTENT_TYPES:
+    CONTENT_TYPES = Q(name__in=CUSTOM_CONTENT_TYPES)
+
+
+#==============================================================================
 class CustomContentType(object):
 
     def __init__(self):
         """
         Constructor
         """
-        self._registry = {}
-
-
-    @property
-    def registry(self):
-        """
-        Property to get the internal registry
-        """
-        return self._registry
-
-
-    def register(self, model_or_iterable):
-        """
-        Registers the given model(s) with the given admin class.
-
-        The model(s) should be Model classes, not instances.
-
-        If a model is already registered, this will raise AlreadyRegistered.
-        """
-        if isinstance(model_or_iterable, ModelBase):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
-            if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
-            self._registry[model] = ContentType.objects.get_for_model(model).model
-
-
-    def unregister(self, model_or_iterable):
-        """
-        Unregisters the given model(s).
-
-        If a model isn't already registered, this will raise NotRegistered.
-        """
-        if isinstance(model_or_iterable, ModelBase):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
-            if model not in self._registry:
-                raise NotRegistered('The model %s is not registered' % model.__name__)
-            del self._registry[model]
-
-
-    def create_fields(self, base_model=models.Model, valid_content_types=None):
+        pass
+    
+    
+    def create_fields(self, base_model=models.Model):
         """
         This method will create a model which will hold field types defined
         at runtime for each ContentType.
         """
-        
+                
         # generic class
         class CustomContentTypeField(base_model):
             DATATYPE_CHOICES = (
@@ -90,12 +58,10 @@ class CustomContentType(object):
                 (CUSTOM_TYPE_BOOLEAN,  _('boolean')),
             )
         
-            VALID_CONTENT_TYPES = valid_content_types or { 'name__in': self._registry.values() }
-        
             content_type = models.ForeignKey(ContentType,
                                              related_name='custom_fields',
                                              verbose_name=_('content type'),
-                                             limit_choices_to=VALID_CONTENT_TYPES)
+                                             limit_choices_to=CONTENT_TYPES)
             name = models.CharField(_('name'), max_length=100, db_index=True)
             label = models.CharField(_('label'), max_length=100)
             data_type = models.CharField(_('data type'), max_length=8, choices=DATATYPE_CHOICES, db_index=True)
@@ -202,7 +168,7 @@ class CustomContentType(object):
                                              related_name='field')
             content_type = models.ForeignKey(ContentType, editable=False,
                                              verbose_name=_('content type'),
-                                             limit_choices_to=custom_field_model.VALID_CONTENT_TYPES)
+                                             limit_choices_to=CONTENT_TYPES)
             object_id = models.PositiveIntegerField(_('object id'), db_index=True)
             content_object = generic.GenericForeignKey('content_type', 'object_id')
 
