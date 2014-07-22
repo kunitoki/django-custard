@@ -56,3 +56,4 @@ INSTALLED_APPS = (
 )
 
 STATIC_URL = '/static/'
+

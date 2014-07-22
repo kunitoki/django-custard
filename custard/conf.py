@@ -2,6 +2,7 @@
 
 from django.conf import settings
 
+
 CUSTOM_TYPE_TEXT     = 'text'
 CUSTOM_TYPE_INTEGER  = 'int'
 CUSTOM_TYPE_FLOAT    = 'float'

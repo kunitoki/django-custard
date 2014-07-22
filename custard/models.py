@@ -2,7 +2,6 @@
 
 from django.db import models
 from django.db.models import Q
-from django.db.models.base import ModelBase
 from django.db.models.loading import get_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -24,12 +23,6 @@ class AlreadyRegistered(Exception):
 
 class NotRegistered(Exception):
     pass
-
-
-#==============================================================================
-CONTENT_TYPES = Q()
-if CUSTOM_CONTENT_TYPES:
-    CONTENT_TYPES = Q(name__in=CUSTOM_CONTENT_TYPES)
 
 
 #==============================================================================
@@ -58,7 +51,10 @@ class CustomContentType(object):
                 (CUSTOM_TYPE_DATETIME, _('datetime')),
                 (CUSTOM_TYPE_BOOLEAN,  _('boolean')),
             )
-        
+
+            CONTENT_TYPES = Q(name__in=CUSTOM_CONTENT_TYPES)\
+                if CUSTOM_CONTENT_TYPES is not None else Q()
+
             content_type = models.ForeignKey(ContentType,
                                              related_name='custom_fields',
                                              verbose_name=_('content type'),
@@ -171,7 +167,7 @@ class CustomContentType(object):
                                              related_name='field')
             content_type = models.ForeignKey(ContentType, editable=False,
                                              verbose_name=_('content type'),
-                                             limit_choices_to=CONTENT_TYPES)
+                                             limit_choices_to=custom_field_model.CONTENT_TYPES)
             object_id = models.PositiveIntegerField(_('object id'), db_index=True)
             content_object = generic.GenericForeignKey('content_type', 'object_id')
 
@@ -236,7 +232,15 @@ class CustomContentType(object):
                 return get_model(values_model[0], values_model[1])
         
             def search(self, search_data, custom_args={}):
-                q = Q()
+                """
+                Search inside the custom fields for this model for any match
+                 of search_data and returns existing model instances
+
+                :param search_data:
+                :param custom_args:
+                :return:
+                """
+                qs = None
                 content_type = ContentType.objects.get_for_model(self.model)
                 custom_args = dict({ 'content_type': content_type, 'searchable': True }, **custom_args)
                 custom = dict((s.name, s) for s in self.get_fields_model().objects.filter(**custom_args))
@@ -247,9 +251,13 @@ class CustomContentType(object):
                                                                        'content_type': content_type,
                                                                        value_lookup: search_data })
                     if found.count() > 0:
-                        q = q & Q(**{ str('%s__in' % (self.model._meta.pk.name)): [f.object_id for f in found] })
-                return self.get_queryset().filter(q)
-                
+                        if qs is None:
+                            qs = Q()
+                        qs = qs & Q(**{ str('%s__in' % self.model._meta.pk.name): [f.object_id for f in found] })
+                if qs is None:
+                    return self.get_queryset().none()
+                return self.get_queryset().filter(qs)
+
         return CustomManager()
         
 
