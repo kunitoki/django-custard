@@ -7,6 +7,9 @@ before_install:
   - export DJANGO_SETTINGS_MODULE=custard.tests.settings
 install:
   - pip install -q Django==$DJANGO --use-mirrors
+  - pip install coveralls --use-mirrors
   - pip install . --use-mirrors
 script:
-  - python manage.py test custard
+  - coverage run --source=custard python manage.py test custard
+after_success:
+  - coveralls
