@@ -15,7 +15,7 @@ even outside of the admin.
    :alt: Build Status - master branch
    :target: https://travis-ci.org/kunitoki/django-custard
 
-.. |coveralls| image:: https://coveralls.io/repos/kunitoki/django-custard/badge.png
+.. |coveralls| image:: https://coveralls.io/repos/kunitoki/django-custard/badge.png?branch=master
    :alt: Source code coverage - master branch
    :target: https://coveralls.io/r/kunitoki/django-custard
 
