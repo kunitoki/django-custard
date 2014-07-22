@@ -46,23 +46,3 @@ Resources
 * Example app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/develop/CHANGELOG.rst>`_
 * Supports: Django 1.6 - Python 2.7
-
-
-
-Installation
-============
-
-1. You can get Django Custard by using pip or easy_install::
-
-    pip install django-custard
-    # or
-    easy_install django-custard
-
-2. You will need to add the ``'custard'`` application to the ``INSTALLED_APPS`` setting of your Django project ``settings.py`` file.::
-
-    INSTALLED_APPS = (
-        ...
-
-        'custard',
-    )
-
