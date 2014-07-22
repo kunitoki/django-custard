@@ -21,13 +21,13 @@ Configuration sample you can use as a start::
   )
 
   CUSTOM_FIELD_TYPES = {
-    'text':     'django.forms.CharField',
-    'integer':  'django.forms.IntegerField',
-    'float':    'django.forms.FloatField',
-    'time':     'django.forms.TimeField',
-    'date':     'django.forms.DateField',
-    'datetime': 'django.forms.DateTimeField',
-    'boolean':  'django.forms.BooleanField',
+    'text':     'django.forms.fields.CharField',
+    'integer':  'django.forms.fields.IntegerField',
+    'float':    'django.forms.fields.FloatField',
+    'time':     'django.forms.fields.TimeField',
+    'date':     'django.forms.fields.DateField',
+    'datetime': 'django.forms.fields.DateTimeField',
+    'boolean':  'django.forms.fields.BooleanField',
   }
     
   CUSTOM_WIDGETS_TYPES = {

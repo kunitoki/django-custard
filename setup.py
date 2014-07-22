@@ -6,11 +6,11 @@ setup(
     name='django-custard',
     version=VERSION,
     description='Django runtime generic customizable fields for any model.',
-    author='Lucio Asnaghi (kunitoki)',
+    author='Lucio Asnaghi (aka kunitoki)',
     author_email='kunitoki@gmail.com',
     url='https://github.com/kunitoki/django-custard',
     download_url='https://github.com/kunitoki/django-custard/releases/tag/%s' % VERSION,
-    keywords=['django', 'customfields'],
+    keywords=['django', 'models', 'fields', 'custom', 'admin', 'content types'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Django',

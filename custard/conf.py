@@ -15,13 +15,13 @@ CUSTOM_CONTENT_TYPES = getattr(settings, 'CUSTOM_CONTENT_TYPES', None)
 
 
 CUSTOM_FIELD_TYPES = {
-    CUSTOM_TYPE_TEXT:     'django.forms.CharField',
-    CUSTOM_TYPE_INTEGER:  'django.forms.IntegerField',
-    CUSTOM_TYPE_FLOAT:    'django.forms.FloatField',
-    CUSTOM_TYPE_TIME:     'django.forms.TimeField',
-    CUSTOM_TYPE_DATE:     'django.forms.DateField',
-    CUSTOM_TYPE_DATETIME: 'django.forms.DateTimeField',
-    CUSTOM_TYPE_BOOLEAN:  'django.forms.BooleanField',
+    CUSTOM_TYPE_TEXT:     'django.forms.fields.CharField',
+    CUSTOM_TYPE_INTEGER:  'django.forms.fields.IntegerField',
+    CUSTOM_TYPE_FLOAT:    'django.forms.fields.FloatField',
+    CUSTOM_TYPE_TIME:     'django.forms.fields.TimeField',
+    CUSTOM_TYPE_DATE:     'django.forms.fields.DateField',
+    CUSTOM_TYPE_DATETIME: 'django.forms.fields.DateTimeField',
+    CUSTOM_TYPE_BOOLEAN:  'django.forms.fields.BooleanField',
 }
 
 CUSTOM_FIELD_TYPES.update(getattr(settings, 'CUSTOM_FIELD_TYPES', {}))

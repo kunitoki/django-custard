@@ -20,6 +20,7 @@ from .utils import import_class
 class AlreadyRegistered(Exception):
     pass
 
+
 class NotRegistered(Exception):
     pass
 
@@ -38,8 +39,7 @@ class CustomContentType(object):
         Constructor
         """
         pass
-    
-    
+
     def create_fields(self, base_model=models.Model):
         """
         This method will create a model which will hold field types defined
@@ -85,11 +85,11 @@ class CustomContentType(object):
         
             def validate_unique(self, exclude=None):
                 # HACK - workaround django bug https://code.djangoproject.com/ticket/17582
-                try:
-                    ct = self.content_type
-                except:
-                    raise ValidationError({ NON_FIELD_ERRORS: (_('The content type has not been specified'),) })
-                
+                #try:
+                #ct = self.content_type
+                #except:
+                #    raise ValidationError({ NON_FIELD_ERRORS: (_('The content type has not been specified'),) })
+
                 # field name already defined in Model class
                 model = self.content_type.model_class()
                 if self.name in [f.name for f in model._meta.fields]:
@@ -157,7 +157,6 @@ class CustomContentType(object):
 
         return CustomContentTypeField
 
-
     def create_values(self, custom_field_model, base_model=models.Model):
         """
         This method will create a model which will hold field values for
@@ -183,8 +182,10 @@ class CustomContentType(object):
         
             def _get_value(self):
                 return getattr(self, 'value_%s' % self.custom_field.data_type)
+
             def _set_value(self, new_value):
                 setattr(self, 'value_%s' % self.custom_field.data_type, new_value)
+
             value = property(_get_value, _set_value)
     
             class Meta:
@@ -213,7 +214,6 @@ class CustomContentType(object):
                 return "%s(%s): %s" % (self.custom_field.name, self.object_id, self.value)
     
         return CustomContentTypeFieldValue
-
 
     def create_manager(self, fields_model, values_model):
         """
