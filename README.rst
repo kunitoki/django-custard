@@ -45,7 +45,7 @@ Resources
 * Documentation: http://django-custard.readthedocs.org/en/latest
 * Example app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/develop/CHANGELOG.rst>`_
-* Supports: Django 1.6. Python: 2.7
+* Supports: Django 1.6 - Python 2.7
 
 
 
