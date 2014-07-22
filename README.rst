@@ -17,4 +17,4 @@ django-custard
     :target: https://pypi.python.org/pypi/django-custard/
 
 
-|travis||coveralls||pypi||downloads|
+|travis| |coveralls| |pypi| |downloads|
