@@ -12,8 +12,6 @@ class Example(models.Model):
     def __str__(self):
         return "%s" % self.name
 
-custom.register(Example)
-
 
 class CustomFieldsModel(custom.create_fields()):
     class Meta:

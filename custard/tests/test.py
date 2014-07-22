@@ -28,4 +28,3 @@ class CustomModelsTestCase(TestCase):
                                               label='Text field',
                                               data_type=CUSTOM_TYPE_TEXT)
         cf.save()
-        

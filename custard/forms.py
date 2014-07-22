@@ -64,6 +64,9 @@ class CustomFieldModelBaseForm(forms.ModelForm):
                                                     self.cleaned_data[name])
             value.save()
 
+    def get_model(self):
+        return self._meta.model
+
     def get_content_type(self):
         return ContentType.objects.get_for_model(self.get_model())
 

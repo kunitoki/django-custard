@@ -12,7 +12,14 @@ Full example
 Configuration sample you can use as a start::
 
   # Django Custard configuration example
-  
+
+  CUSTOM_CONTENT_TYPES = (
+    'mymodelname',
+    'myothermodelname',
+    'user',
+    'group',
+  )
+
   CUSTOM_FIELD_TYPES = {
     'text':     'django.forms.CharField',
     'integer':  'django.forms.IntegerField',
@@ -36,6 +43,17 @@ Configuration sample you can use as a start::
 
 Parameters
 ----------
+
+CUSTOM_CONTENT_TYPES
+^^^^^^^^^^^^^^^^^^^^
+
+Select which content types will have custom fields, the name is the lower model name as it is available in ContentType.model::
+
+  CUSTOM_CONTENT_TYPES = (
+    'mymodelname',
+    'myothermodelname',
+  )
+
 
 CUSTOM_FIELD_TYPES
 ^^^^^^^^^^^^^^^^^^

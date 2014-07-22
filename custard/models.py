@@ -108,12 +108,13 @@ class CustomContentType(object):
                 # if field is required must issue a initial value
                 if self.required:
                     # TODO - must create values for all instances that have not
-                    print model.objects.values_list('pk', flat=True)
-                    print self.field.filter(content_type=self.content_type)
-                    objs = self.field.filter(content_type=self.content_type) \
-                                     .exclude(object_id__in=model.objects.values_list('pk', flat=True))
-                    for obj in objs:
-                        print obj
+                    #print model.objects.values_list('pk', flat=True)
+                    #print self.field.filter(content_type=self.content_type)
+                    #objs = self.field.filter(content_type=self.content_type) \
+                    #                 .exclude(object_id__in=model.objects.values_list('pk', flat=True))
+                    #for obj in objs:
+                    #    print obj
+                    pass
         
             def get_form_field(self):
                 field_attrs = {
