@@ -2,9 +2,9 @@
    :alt: Django Custard
    :target: https://github.com/kunitoki/django-custard
 
-========================================================
-Django runtime generic customizable fields for any model
-========================================================
+==========================================
+Django runtime customizable generic fields
+==========================================
 
 Django Custard is a small reusable `Django <http://www.djangoproject.com>`_ app
 that implements runtime customizable fields that can be attached to any model

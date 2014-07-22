@@ -7,6 +7,7 @@ from django.db.models.loading import get_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
@@ -45,8 +46,8 @@ class CustomContentType(object):
         This method will create a model which will hold field types defined
         at runtime for each ContentType.
         """
-                
-        # generic class
+
+        @python_2_unicode_compatible
         class CustomContentTypeField(base_model):
             DATATYPE_CHOICES = (
                 (CUSTOM_TYPE_TEXT,     _('text')),
@@ -152,7 +153,7 @@ class CustomContentType(object):
                 field_type = import_class(CUSTOM_FIELD_TYPES[self.data_type])
                 return field_type(**field_attrs)
         
-            def __unicode__(self):
+            def __str__(self):
                 return "%s" % (self.name)
 
         return CustomContentTypeField
@@ -162,6 +163,8 @@ class CustomContentType(object):
         This method will create a model which will hold field values for
         field types of custom_field_model.
         """
+
+        @python_2_unicode_compatible
         class CustomContentTypeFieldValue(base_model):
             custom_field = models.ForeignKey(custom_field_model,
                                              verbose_name=_('custom field'),
@@ -209,8 +212,10 @@ class CustomContentType(object):
                     qs = qs.exclude(pk=self.pk)
                 if qs.exists():
                     raise ValidationError({ NON_FIELD_ERRORS: (_('A value for this custom field already exists'),) })
-        
-            def __unicode__(self):
+
+                # TODO - here perform custom validation of value
+
+            def __str__(self):
                 return "%s(%s): %s" % (self.custom_field.name, self.object_id, self.value)
     
         return CustomContentTypeFieldValue

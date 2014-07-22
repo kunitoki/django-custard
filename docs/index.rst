@@ -2,9 +2,9 @@
    :alt: Django Custard
    :target: https://github.com/kunitoki/django-custard
 
-========================================================
-Django runtime generic customizable fields for any model
-========================================================
+==========================================
+Django runtime customizable generic fields
+==========================================
 
 Django Custard is a small reusable `Django <http://www.djangoproject.com>`_ app
 that implements runtime customizable fields that can be attached to any model
@@ -63,6 +63,18 @@ Installation
 
         'custard',
     )
+
+3. In a ``models.py`` file in your app you should just add the 2 models responsible of holding the custom fields type and values.::
+
+    from custard.models import custom
+
+    ...
+
+    class CustomFieldsModel(custom.create_fields()):
+        pass
+
+    class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+        pass
 
 
 
