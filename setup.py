@@ -1,16 +1,34 @@
 from setuptools import setup
 
-VERSION = __import__('custard').VERSION
+from custard import VERSION
 
 setup(
     name='django-custard',
     version=VERSION,
-    description='Django runtime generic customizable fields for any model.',
+    url='https://github.com/kunitoki/django-custard',
     author='Lucio Asnaghi (aka kunitoki)',
     author_email='kunitoki@gmail.com',
-    url='https://github.com/kunitoki/django-custard',
-    download_url='https://github.com/kunitoki/django-custard/releases/tag/%s' % VERSION,
-    keywords=['django', 'models', 'fields', 'custom', 'admin', 'content types'],
+    description='Django runtime generic customizable fields for any model.',
+    long_description=open('README.rst').read(),
+    license='LICENSE.txt',
+    packages=[
+        'custard',
+        'custard.tests',
+    ],
+    package_data={
+        'custard': ['templates/custard/admin/*.html'],
+    },
+    install_requires=[
+        "Django >= 1.6.5",
+    ],
+    keywords=[
+        'django',
+        'models',
+        'fields',
+        'custom',
+        'admin',
+        'content types'
+    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Django',
@@ -23,4 +41,3 @@ setup(
         'Topic :: Software Development',
     ]
 )
-

@@ -1,0 +1,9 @@
+include AUTHORS
+include LICENSE.txt
+include CHANGELOG.rst
+include README.rst
+include MANIFEST.in
+recursive-include docs *.rst
+recursive-include custard *
+recursive-include example *
+global-exclude *.sqlite3

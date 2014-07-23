@@ -31,13 +31,13 @@ even outside of the admin.
 
 
 Licence
--------
+=======
 
 * Django Custard is licensed under `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_ license.
 
 
 Resources
----------
+=========
 
 * Home page: https://github.com/kunitoki/django-custard
 * Licence: https://github.com/kunitoki/django-custard/blob/master/LICENSE.txt
@@ -77,7 +77,6 @@ Installation
         pass
 
 
-
 Customization
 =============
 
@@ -102,27 +101,21 @@ Models
    models
 
 
-Forms
------
+..
+    Forms
+    -----
+    Form tabs help you organize form fieldsets and inlines into tabs.
+    .. toctree::
+       :maxdepth: 1
+       forms
 
-Form tabs help you organize form fieldsets and inlines into tabs.
-
-.. toctree::
-   :maxdepth: 1
-
-   forms
-
-
-Admin integration
------------------
-
-There are handy widgets included in Django Suit.
-
-.. toctree::
-   :maxdepth: 3
-
-   admin
-
+..
+    Admin integration
+    -----------------
+    There are handy widgets included in Django Suit.
+    .. toctree::
+       :maxdepth: 3
+       admin
 
 
 Support

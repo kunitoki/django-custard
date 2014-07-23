@@ -3,7 +3,9 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 
-from .conf import CUSTOM_WIDGETS_TYPES
+from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
+    CUSTOM_TYPE_TIME, CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME, CUSTOM_TYPE_BOOLEAN,
+    CUSTOM_CONTENT_TYPES, CUSTOM_FIELD_TYPES, CUSTOM_WIDGETS_TYPES)
 from .utils import import_class
 
 
@@ -43,10 +45,10 @@ class CustomFieldModelBaseForm(forms.ModelForm):
         for f in fields:
             name = str(f.name)
             initial = f.initial
-            self.fields[name] = f.get_form_field()
+            self.fields[name] = self.get_formfield_for_field(f)
             self.fields[name].is_custom = True
             self.fields[name].required = f.required
-            self.fields[name].widget = self.get_widget_for_field(f.data_type)
+            self.fields[name].widget = self.get_widget_for_field(f)
             if self.instance and self.instance.pk:
                 value = self.search_value_for_field(f,
                                                     content_type,
@@ -88,15 +90,57 @@ class CustomFieldModelBaseForm(forms.ModelForm):
         """
         return ContentType.objects.get_for_model(self.get_model())
 
-    def get_widget_for_field(self, fieldtype, attrs={}):
+    def get_formfield_for_field(self, field):
+        """
+        Returns the defined formfield instance built from the type of the field
+
+        :param field: custom field instance
+        :return: the formfield instance
+        """
+        field_attrs = {
+            'label': field.label,
+            'help_text': field.help_text,
+            'required': field.required,
+        }
+        if field.data_type == CUSTOM_TYPE_TEXT:
+            #widget_attrs = {}
+            if field.min_length:
+                field_attrs['min_length'] = field.min_length
+            if field.max_length:
+                field_attrs['max_length'] = field.max_length
+            #    widget_attrs['maxlength'] = field.max_length
+            #field_attrs['widget'] = widgets.AdminTextInputWidget(attrs=widget_attrs)
+        elif field.data_type == CUSTOM_TYPE_INTEGER:
+            if field.min_value: field_attrs['min_value'] = int(float(field.min_value))
+            if field.max_value: field_attrs['max_value'] = int(float(field.max_value))
+            #field_attrs['widget'] = spinner.IntegerSpinnerWidget(attrs=field_attrs)
+        elif field.data_type == CUSTOM_TYPE_FLOAT:
+            if field.min_value: field_attrs['min_value'] = float(field.min_value)
+            if field.max_value: field_attrs['max_value'] = float(field.max_value)
+            #field_attrs['widget'] = spinner.SpinnerWidget(attrs=field_attrs)
+        elif field.data_type == CUSTOM_TYPE_TIME:
+            #field_attrs['widget'] = date.TimePickerWidget()
+            pass
+        elif field.data_type == CUSTOM_TYPE_DATE:
+            #field_attrs['widget'] = date.DatePickerWidget()
+            pass
+        elif field.data_type == CUSTOM_TYPE_DATETIME:
+            #field_attrs['widget'] = date.DateTimePickerWidget()
+            pass
+        elif field.data_type == CUSTOM_TYPE_BOOLEAN:
+            pass
+        field_type = import_class(CUSTOM_FIELD_TYPES[field.data_type])
+        return field_type(**field_attrs)
+
+    def get_widget_for_field(self, field, attrs={}):
         """
         Returns the defined widget type instance built from the type of the field
 
-        :param fieldtype: string referring to field types
+        :param field: custom field instance
         :param attrs: attributes of widgets
         :return: the widget instance
         """
-        return import_class(CUSTOM_WIDGETS_TYPES[fieldtype])(**attrs)
+        return import_class(CUSTOM_WIDGETS_TYPES[field.data_type])(**attrs)
 
     def get_fields_for_content_type(self, content_type):
         """

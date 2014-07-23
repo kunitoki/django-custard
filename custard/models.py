@@ -112,43 +112,7 @@ class CustomContentType(object):
                     #for obj in objs:
                     #    print obj
                     pass
-        
-            def get_form_field(self):
-                field_attrs = {
-                    'label': self.label,
-                    'help_text': self.help_text,
-                    'required': self.required,
-                }
-                if self.data_type == CUSTOM_TYPE_TEXT:
-                    #widget_attrs = {}
-                    if self.min_length:
-                        field_attrs['min_length'] = self.min_length
-                    if self.max_length:
-                        field_attrs['max_length'] = self.max_length
-                    #    widget_attrs['maxlength'] = self.max_length
-                    #field_attrs['widget'] = widgets.AdminTextInputWidget(attrs=widget_attrs)
-                elif self.data_type == CUSTOM_TYPE_INTEGER:
-                    if self.min_value: field_attrs['min_value'] = int(self.min_value)
-                    if self.max_value: field_attrs['max_value'] = int(self.max_value)
-                    #field_attrs['widget'] = spinner.IntegerSpinnerWidget(attrs=field_attrs)
-                elif self.data_type == CUSTOM_TYPE_FLOAT:
-                    if self.min_value: field_attrs['min_value'] = float(self.min_value)
-                    if self.max_value: field_attrs['max_value'] = float(self.max_value)
-                    #field_attrs['widget'] = spinner.SpinnerWidget(attrs=field_attrs)
-                elif self.data_type == CUSTOM_TYPE_TIME:
-                    #field_attrs['widget'] = date.TimePickerWidget()
-                    pass
-                elif self.data_type == CUSTOM_TYPE_DATE:
-                    #field_attrs['widget'] = date.DatePickerWidget()
-                    pass
-                elif self.data_type == CUSTOM_TYPE_DATETIME:
-                    #field_attrs['widget'] = date.DateTimePickerWidget()
-                    pass
-                elif self.data_type == CUSTOM_TYPE_BOOLEAN:
-                    pass
-                field_type = import_class(CUSTOM_FIELD_TYPES[self.data_type])
-                return field_type(**field_attrs)
-        
+
             def __str__(self):
                 return "%s" % (self.name)
 
@@ -216,15 +180,17 @@ class CustomContentType(object):
     
         return CustomContentTypeFieldValue
 
-    def create_manager(self, fields_model, values_model):
+    def create_manager(self, fields_model, values_model, base_manager=models.Manager):
         """
         This will create the custom Manager that will use the fields_model and values_model
         respectively.
         """
         fields_model = fields_model.split(".")
         values_model = values_model.split(".")
-        
-        class CustomManager(models.Manager):
+
+        # TODO validate fields_model / values_model strings
+
+        class CustomManager(base_manager):
             def get_fields_model(self):
                 return get_model(fields_model[0], fields_model[1])
         

@@ -41,6 +41,21 @@ Configuration sample you can use as a start::
   }
 
 
+Constants
+---------
+
+There are some constants defined in ``custard.conf`` that hold the field type
+names. These can't be changed::
+
+  CUSTOM_TYPE_TEXT     = 'text'
+  CUSTOM_TYPE_INTEGER  = 'int'
+  CUSTOM_TYPE_FLOAT    = 'float'
+  CUSTOM_TYPE_TIME     = 'time'
+  CUSTOM_TYPE_DATE     = 'date'
+  CUSTOM_TYPE_DATETIME = 'datetime'
+  CUSTOM_TYPE_BOOLEAN  = 'boolean'
+
+
 Parameters
 ----------
 

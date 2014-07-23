@@ -56,10 +56,10 @@ class CustomModelsTestCase(TestCase):
     #    self.assertQuerysetEqual(ContentType.objects.filter(TestCustomFieldsModel.CONTENT_TYPES),
     #                             ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
 
-    def test_get_form_fields(self):
-        with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.CharField'}):
-            self.assertIsNotNone(self.cf.get_form_field())
-            self.assertEqual(django.forms.fields.CharField, self.cf.get_form_field().__class__)
+    #def test_get_form_fields(self):
+    #    with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.CharField'}):
+    #        self.assertIsNotNone(self.cf.get_form_field())
+    #        self.assertEqual(django.forms.fields.CharField, self.cf.get_form_field().__class__)
 
     def test_value_creation(self):
         val = CustomValuesModel.objects.create(custom_field=self.cf,
