@@ -4,6 +4,12 @@ Changelog
 Only important changes are mentioned below.
 
 
+v0.6 (2014-07-23)
+-----------------
+
+* Fixed documentation links and sections not showing up
+
+
 v0.5 (2014-07-23)
 -----------------
 

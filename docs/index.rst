@@ -42,7 +42,7 @@ Resources
 =========
 
 * Home page: https://github.com/kunitoki/django-custard
-* Documentation: http://django-custard.readthedocs.org/en/latest
+* Documentation: http://django-custard.readthedocs.org
 * Example app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/master/CHANGELOG.rst>`_
 * License: `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_
@@ -103,8 +103,8 @@ Models
    models
 
 
-Admin integration
------------------
+Admin
+-----
 
 Here is the process of integrating Django Custard in admin.
 

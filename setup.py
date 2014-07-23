@@ -19,7 +19,7 @@ setup(
         'custard': ['templates/custard/admin/*.html'],
     },
     install_requires=[
-        "Django >= 1.6.5",
+        "Django >= 1.6",
     ],
     keywords=[
         'django',
