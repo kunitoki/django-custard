@@ -19,6 +19,10 @@ even outside of the admin.
    :alt: Source code coverage - master branch
    :target: https://coveralls.io/r/kunitoki/django-custard
 
+.. |pythonversions| image:: https://pypip.in/py_versions/django-custard/badge.png
+    :target: https://pypi.python.org/pypi/django-custard/
+    :alt: Supported Python versions
+
 .. |pypi| image:: https://pypip.in/v/django-custard/badge.png
    :alt: Pypi latest version
    :target: https://pypi.python.org/pypi/django-custard/
@@ -27,13 +31,11 @@ even outside of the admin.
    :alt: Pypi downloads
    :target: https://pypi.python.org/pypi/django-custard/
 
-|travis| |coveralls| |pypi| |downloads|
+.. |license| image:: https://pypip.in/license/django-custard/badge.png
+    :target: https://pypi.python.org/pypi/django-custard/
+    :alt: License
 
-
-Licence
--------
-
-* Django Custard is licensed under `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_ license.
+|pypi| |travis| |coveralls| |downloads| |pythonversions| |license|
 
 
 Resources
@@ -41,7 +43,7 @@ Resources
 
 * Home page: https://github.com/kunitoki/django-custard
 * Documentation: http://django-custard.readthedocs.org/en/latest
-* Licence: https://github.com/kunitoki/django-custard/blob/master/LICENSE.txt
 * Example app on Github: https://github.com/kunitoki/django-custard/example
+* Licence: `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/develop/CHANGELOG.rst>`_
 * Supports: Django 1.6 - Python 2.7

@@ -5,12 +5,12 @@ from custard import VERSION
 setup(
     name='django-custard',
     version=VERSION,
+    license='MIT',
     url='https://github.com/kunitoki/django-custard',
     author='Lucio Asnaghi (aka kunitoki)',
     author_email='kunitoki@gmail.com',
     description='Django runtime generic customizable fields for any model.',
     long_description=open('README.rst').read(),
-    license='LICENSE.txt',
     packages=[
         'custard',
         'custard.tests',

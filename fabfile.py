@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from fabric.api import env, task, cd, lcd, run, local
+from fabric.api import env, task, cd, lcd, run, local, settings
 
 from custard import VERSION
 
@@ -31,6 +31,8 @@ def update_docs():
 @task
 def create_release():
     with lcd("."):
+        with settings(warn_only=True):
+            local("git tag -d %s && git push origin :refs/tags/%s" % (VERSION, VERSION))
         local("git tag %s" % VERSION)
         local("git push --tags")
         local("python setup.py register -r pypi")
