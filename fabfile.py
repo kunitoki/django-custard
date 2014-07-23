@@ -20,23 +20,17 @@ def demo_server():
         local("python manage.py runserver")
 
 
+@task
+def demo_shell():
+    with lcd("example"):
+        local("python manage.py shell")
+
+
 #==============================================================================
 @task
 def update_docs():
     with lcd("docs"):
         local("make html")
-
-
-#==============================================================================
-@task
-def create_release():
-    with lcd("."):
-        with settings(warn_only=True):
-            local("git tag -d %s && git push origin :refs/tags/%s" % (VERSION, VERSION))
-        local("git tag %s" % VERSION)
-        local("git push --tags")
-        local("python setup.py register -r pypi")
-        local("python setup.py sdist upload -r pypi")
 
 
 #==============================================================================
@@ -51,3 +45,14 @@ def pypi_upload(where="pypitest"):
     with lcd("."):
         local("python setup.py sdist upload -r %s" % where)
 
+
+#==============================================================================
+@task
+def create_release():
+    with lcd("."):
+        with settings(warn_only=True):
+            local("git tag -d %s && git push origin :refs/tags/%s" % (VERSION, VERSION))
+        local("git tag %s" % VERSION)
+        local("git push --tags")
+        local("python setup.py register -r pypi")
+        local("python setup.py sdist upload -r pypi")

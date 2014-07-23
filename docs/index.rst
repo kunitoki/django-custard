@@ -39,13 +39,13 @@ even outside of the admin.
 
 
 Resources
----------
+=========
 
 * Home page: https://github.com/kunitoki/django-custard
 * Documentation: http://django-custard.readthedocs.org/en/latest
 * Example app on Github: https://github.com/kunitoki/django-custard/example
-* Licence: `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_
-* Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/develop/CHANGELOG.rst>`_
+* Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/master/CHANGELOG.rst>`_
+* License: `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_
 * Supports: Django 1.6 - Python 2.7
 
 
@@ -103,21 +103,15 @@ Models
    models
 
 
-..
-    Forms
-    -----
-    Form tabs help you organize form fieldsets and inlines into tabs.
-    .. toctree::
-       :maxdepth: 1
-       forms
+Admin integration
+-----------------
 
-..
-    Admin integration
-    -----------------
-    There are handy widgets included in Django Suit.
-    .. toctree::
-       :maxdepth: 3
-       admin
+Here is the process of integrating Django Custard in admin.
+
+.. toctree::
+   :maxdepth: 3
+
+   admin
 
 
 Support

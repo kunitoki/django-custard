@@ -39,23 +39,61 @@ subclass of ``django_extensions.db.modelsTimeStampedModel``::
 Default for ``base_model`` is ``django.db.models.Model``
 
 
+Mixin
+-----
+
+When building your models you can attach a special ``Mixin`` that implements
+some helper functions to ease set and get custom field values::
+
+  from django.db import models
+  from custard.models import custom
+
+  CustomMixin = custom.create_mixin('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+
+  class Example(models.Model, CustomMixin):
+      name = models.CharField(max_length=255)
+
+  class CustomFieldsModel(custom.create_fields()):
+      pass
+
+  class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+      pass
+
+The Mixin must know which classes are actually implementing the custom fields
+definitions and the custom fields values, so ``custom.create_mixin`` you must
+explicitly specify those model model with the full application label.
+
+A number of methods are then added to your model:
+
+``get_custom_fields(self)``
+    Return a list of custom fields for this model
+
+``get_custom_field(self, field_name)``
+    Get a custom field object for this model
+
+``get_custom_value(self, field_name)``
+    Get a value for a specified custom field
+
+``set_custom_value(self, field_name, value)``
+    Set a value for a specified custom field
+
+
 Manager
 -------
 
 In order to be able to search custom fields flagged as ``searchable`` in models,
-a special manager is then created for your specific models::
+you can create a special manager for your model needs::
 
   from django.db import models
   from custard.models import custom
+
+  CustomManager = custom.create_manager('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
 
   class Example(models.Model):
       name = models.CharField(max_length=255)
 
       objects = models.Manager()
-      custom = custom.create_manager('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
-
-      def __str__(self):
-          return "%s" % self.name
+      custom = CustomManager()
 
   class CustomFieldsModel(custom.create_fields()):
       pass
@@ -77,17 +115,42 @@ like doing a filter call::
   qs = Example.custom.search('foobar')
 
 
+It is also possible to use a specific Manager as base class for your custom
+manager::
+
+  from django.db import models
+  from custard.models import custom
+
+  class MyUberManager(models.Manager):
+      def super_duper(self):
+          return None
+
+  CustomManager = custom.create_manager('myapp.CustomFieldsModel',
+                                        'myapp.CustomValuesModel',
+                                        base_manager=MyUberManager)
+
+  class Example(models.Model):
+      objects = CustomManager()
+
+  Example.objects.super_duper()
+
+
+.. warning::
+   Be careful to always define a default_manager for you Model named ``objects``.
+   If for some reason you omit to do so, you likely will end up in runtime errors
+   when you use any class in Django Custard.
+
+
 Using the models
 ----------------
 
 It's possible to create fields on the fly for any model and create::
 
   from django.contrib.contenttypes.models import ContentType
+  from custard.conf import CUSTOM_TYPE_TEXT
+  from custard.models import custom
 
-  from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_CONTENT_TYPES
-  from custard.models import custom, AlreadyRegistered, NotRegistered
-
-  from myapp.models import Example, CustomFieldsModel, CustomValuesModel
+  from .models import Example, CustomFieldsModel, CustomValuesModel
 
   # First obtain the content type
   example_content_type = ContentType.objects.get_for_model(Example)
@@ -107,5 +170,3 @@ It's possible to create fields on the fly for any model and create::
   custom_value.save()
 
 
-In a future version will be possible to ease the creation of fields by doing it
-directly inside a ``Mixin`` that you attach to your models.

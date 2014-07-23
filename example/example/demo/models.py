@@ -4,11 +4,14 @@ from custard.models import custom
 
 # Create your models here.
 
+CustomModelMixin = custom.create_mixin('demo.CustomFieldsModel', 'demo.CustomValuesModel')
+CustomModelManager = custom.create_manager('demo.CustomFieldsModel', 'demo.CustomValuesModel')
 
-class Example(models.Model):
+
+class Example(models.Model, CustomModelMixin):
     name = models.CharField(max_length=255)
-    
-    custom = custom.create_manager('demo.CustomFieldsModel', 'demo.CustomValuesModel')   
+
+    objects = CustomModelManager()
     
     def __str__(self):
         return "%s" % self.name

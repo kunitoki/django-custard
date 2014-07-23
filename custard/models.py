@@ -7,37 +7,24 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
     CUSTOM_TYPE_TIME, CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME, CUSTOM_TYPE_BOOLEAN,
     CUSTOM_CONTENT_TYPES, CUSTOM_FIELD_TYPES)
 
-from .utils import import_class
-
-
-#==============================================================================
-class AlreadyRegistered(Exception):
-    pass
-
-
-class NotRegistered(Exception):
-    pass
-
 
 #==============================================================================
 class CustomContentType(object):
-
-    def __init__(self):
-        """
-        Constructor
-        """
-        pass
 
     def create_fields(self, base_model=models.Model):
         """
         This method will create a model which will hold field types defined
         at runtime for each ContentType.
+
+        :param base_model:
+        :return:
         """
 
         @python_2_unicode_compatible
@@ -79,7 +66,7 @@ class CustomContentType(object):
         
             def save(self, *args, **kwargs):
                 super(CustomContentTypeField, self).save(*args, **kwargs)
-        
+
             def validate_unique(self, exclude=None):
                 # HACK - workaround django bug https://code.djangoproject.com/ticket/17582
                 #try:
@@ -122,6 +109,10 @@ class CustomContentType(object):
         """
         This method will create a model which will hold field values for
         field types of custom_field_model.
+
+        :param custom_field_model:
+        :param base_model:
+        :return:
         """
 
         @python_2_unicode_compatible
@@ -184,6 +175,10 @@ class CustomContentType(object):
         """
         This will create the custom Manager that will use the fields_model and values_model
         respectively.
+
+        :param fields_model:
+        :param values_model:
+        :return:
         """
         fields_model = fields_model.split(".")
         values_model = values_model.split(".")
@@ -191,10 +186,12 @@ class CustomContentType(object):
         # TODO validate fields_model / values_model strings
 
         class CustomManager(base_manager):
-            def get_fields_model(self):
+            @cached_property
+            def _fields_model(self):
                 return get_model(fields_model[0], fields_model[1])
         
-            def get_values_model(self):
+            @cached_property
+            def _values_model(self):
                 return get_model(values_model[0], values_model[1])
         
             def search(self, search_data, custom_args={}):
@@ -206,26 +203,78 @@ class CustomContentType(object):
                 :param custom_args:
                 :return:
                 """
-                qs = None
+                query = None
                 content_type = ContentType.objects.get_for_model(self.model)
                 custom_args = dict({ 'content_type': content_type, 'searchable': True }, **custom_args)
-                custom = dict((s.name, s) for s in self.get_fields_model().objects.filter(**custom_args))
-                for key, custom_field in custom.items():
-                    value_lookup = 'value_text' # TODO - search in other field types (not only text)
+                custom_fields = dict((f.name, f) for f in self._fields_model.objects.filter(**custom_args))
+                for key, f in custom_fields.items():
+                    # TODO - search in other field types (not only text)
+                    value_lookup = 'value_text'
                     value_lookup = '%s__%s' % (value_lookup, 'icontains')
-                    found = self.get_values_model().objects.filter(**{ 'custom_field': custom_field,
-                                                                       'content_type': content_type,
-                                                                       value_lookup: search_data })
+                    found = self._values_model.objects.filter(**{ 'custom_field': f,
+                                                                  'content_type': content_type,
+                                                                  value_lookup: search_data })
                     if found.count() > 0:
-                        if qs is None:
-                            qs = Q()
-                        qs = qs & Q(**{ str('%s__in' % self.model._meta.pk.name): [f.object_id for f in found] })
-                if qs is None:
+                        if query is None:
+                            query = Q()
+                        query = query & Q(**{ str('%s__in' % self.model._meta.pk.name):
+                                              [obj.object_id for obj in found] })
+                if query is None:
                     return self.get_queryset().none()
-                return self.get_queryset().filter(qs)
+                return self.get_queryset().filter(query)
 
-        return CustomManager()
-        
+        return CustomManager
+
+    def create_mixin(self, fields_model, values_model):
+        """
+
+        :param fields_model:
+        :param values_model:
+        :return:
+        """
+
+        fields_model = fields_model.split(".")
+        values_model = values_model.split(".")
+
+        # TODO validate fields_model / values_model strings
+
+        class CustomModelMixin(object):
+            @cached_property
+            def _fields_model(self):
+                return get_model(fields_model[0], fields_model[1])
+
+            @cached_property
+            def _values_model(self):
+                return get_model(values_model[0], values_model[1])
+
+            @cached_property
+            def _content_type(self):
+                return ContentType.objects.get_for_model(self.__class__)
+
+            def get_custom_fields(self):
+                """ Return a list of custom fields for this model """
+                return self._fields_model.objects.filter(content_type=self._content_type)
+
+            def get_custom_field(self, field_name):
+                """ Get a custom field object for this model """
+                return self._fields_model.objects.get(name=field_name,
+                                                      content_type=self._content_type)
+
+            def get_custom_value(self, field_name):
+                """ Get a value for a specified custom field """
+                return self._values_model.objects.get(custom_field__name=field_name,
+                                                      content_type=self._content_type,
+                                                      object_id=self.pk).value
+
+            def set_custom_value(self, field_name, value):
+                """ Set a value for a specified custom field """
+                custom_value = self._values_model.objects.get_or_create(custom_field__name=field_name,
+                                                                        object_id=self.pk)[0]
+                custom_value.value = value
+                custom_value.save()
+                return custom_value
+
+        return CustomModelMixin
 
 #==============================================================================
 custom = CustomContentType()

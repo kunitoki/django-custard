@@ -7,9 +7,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
 
-import custard
-from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_CONTENT_TYPES
-from custard.models import custom, AlreadyRegistered, NotRegistered
+from custard.conf import CUSTOM_TYPE_TEXT
+from custard.models import custom
 
 from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
     CustomFieldsModel, CustomValuesModel)

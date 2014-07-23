@@ -2,6 +2,8 @@ from django.db import models
 
 from custard.models import custom
 
+CustomMixin = custom.create_mixin('tests.CustomFieldsModel', 'tests.CustomValuesModel')
+CustomManager = custom.create_manager('tests.CustomFieldsModel', 'tests.CustomValuesModel')
 
 class SimpleModelNotRegistered(models.Model):
     name = models.CharField(max_length=255)
@@ -23,10 +25,10 @@ class SimpleModelWithoutManager(models.Model):
         return "%s" % self.name
 
 
-class SimpleModelWithManager(models.Model):
+class SimpleModelWithManager(models.Model, CustomMixin):
     name = models.CharField(max_length=255)
 
-    objects = custom.create_manager('tests.CustomFieldsModel', 'tests.CustomValuesModel')
+    objects = CustomManager()
 
     class Meta:
         app_label = 'tests'

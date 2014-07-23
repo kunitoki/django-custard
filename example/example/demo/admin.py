@@ -33,7 +33,7 @@ class ExampleAdmin(admin.ModelAdmin):
 
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super(ExampleAdmin, self).get_search_results(request, queryset, search_term)
-        queryset |= self.model.custom.search(search_term)
+        queryset |= self.model.objects.search(search_term)
         return queryset, use_distinct
 
 admin.site.register(Example, ExampleAdmin)
