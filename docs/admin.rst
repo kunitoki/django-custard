@@ -96,7 +96,9 @@ need to override ``ModelAdmin.get_search_results`` like this::
       form = ExampleForm
 
       def get_search_results(self, request, queryset, search_term):
-          queryset, use_distinct = super(ExampleAdmin, self).get_search_results(request, queryset, search_term)
+          queryset, use_distinct = super(ExampleAdmin, self).get_search_results(request,
+                                                                                queryset,
+                                                                                search_term)
           queryset |= self.model.objects.search(search_term)
           return queryset, use_distinct
 
