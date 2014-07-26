@@ -81,10 +81,10 @@ class CustomModelsTestCase(TestCase):
                                  ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
 
     def test_get_formfield_for_field(self):
-        with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.TextField'}):
+        with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.EmailField'}):
             form = SimpleModelWithManagerForm(data={}, instance=self.obj)
             self.assertIsNotNone(form.get_formfield_for_field(self.cf))
-            self.assertEqual(django.forms.fields.TextField, form.get_formfield_for_field(self.cf).__class__)
+            self.assertEqual(django.forms.fields.EmailField, form.get_formfield_for_field(self.cf).__class__)
 
     def test_get_widget_for_field(self):
         with self.settings(CUSTOM_WIDGET_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.widgets.CheckboxInput'}):
