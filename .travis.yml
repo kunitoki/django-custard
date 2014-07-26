@@ -12,6 +12,11 @@ install:
   - pip install -q Django==$DJANGO
   - pip install coveralls
   - pip install .
+matrix:
+  exclude:
+    # Django doesn't support following combinations
+    - python: 2.6
+      env: DJANGO=1.6.5
 script:
   - coverage run --source=custard manage.py test custard
 after_success:
