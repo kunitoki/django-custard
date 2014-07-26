@@ -43,6 +43,7 @@ Resources
 
 * Home page: https://github.com/kunitoki/django-custard
 * Documentation: http://django-custard.readthedocs.org
+* Pypi: https://pypi.python.org/pypi/django-custard
 * Example app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/master/CHANGELOG.rst>`_
 * License: `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_
