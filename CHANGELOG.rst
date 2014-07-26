@@ -4,9 +4,11 @@ Changelog
 Only important changes are mentioned below.
 
 
-v0.6 (2014-07-23)
+v0.6 (2014-07-XX)
 -----------------
 
+* Added support for python 2.6/2.7/3.2 and django 1.5/1.6
+* Added test cases for forms and widgets
 * Fixed documentation links and sections not showing up
 
 

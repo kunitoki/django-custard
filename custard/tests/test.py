@@ -2,17 +2,47 @@ import django
 #from django.conf import settings
 #from django.core.urlresolvers import reverse
 #from django.db import models
-#from django.db.models import Q
+from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from custard.conf import CUSTOM_TYPE_TEXT
+from custard.conf import CUSTOM_TYPE_TEXT, settings
 from custard.models import custom
+from custard.forms import CustomFieldModelBaseForm
 
 from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
     CustomFieldsModel, CustomValuesModel)
 
+
+#==============================================================================
+class SimpleModelWithManagerForm(CustomFieldModelBaseForm):
+    class Meta:
+        model = SimpleModelWithManager
+
+    def get_fields_for_content_type(self, content_type):
+        return CustomFieldsModel.objects.filter(content_type=content_type)
+
+    def search_value_for_field(self, field, content_type, object_id):
+        return CustomValuesModel.objects.filter(custom_field=field,
+                                                content_type=content_type,
+                                                object_id=object_id)
+
+    def create_value_for_field(self, field, object_id, value):
+        return CustomValuesModel(custom_field=field,
+                                 object_id=object_id,
+                                 value=value)
+
+#class ExampleAdmin(admin.ModelAdmin):
+#    form = ExampleForm
+#    search_fields = ('name',)
+#
+#    def get_search_results(self, request, queryset, search_term):
+#        queryset, use_distinct = super(ExampleAdmin, self).get_search_results(request, queryset, search_term)
+#        queryset |= self.model.objects.search(search_term)
+#        return queryset, use_distinct
+#
+# admin.site.register(Example, ExampleAdmin)
 
 #==============================================================================
 class CustomModelsTestCase(TestCase):
@@ -41,24 +71,26 @@ class CustomModelsTestCase(TestCase):
     def tearDown(self):
         CustomFieldsModel.objects.all().delete()
 
-    #@override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
-    #def test_creation(self):
-    #    reload(custard.models)
-    #    from custard.models import custom
-    #    print CUSTOM_CONTENT_TYPES
-    #    print settings.CUSTOM_CONTENT_TYPES
-    #
-    #    class TestCustomFieldsModel(custom.create_fields()):
-    #        class Meta:
-    #            app_label = 'tests'
-    #
-    #    self.assertQuerysetEqual(ContentType.objects.filter(TestCustomFieldsModel.CONTENT_TYPES),
-    #                             ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
+    @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
+    def test_creation(self):
+        class TestCustomFieldsModel(custom.create_fields()):
+            class Meta:
+                app_label = 'tests'
 
-    #def test_get_form_fields(self):
-    #    with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.CharField'}):
-    #        self.assertIsNotNone(self.cf.get_form_field())
-    #        self.assertEqual(django.forms.fields.CharField, self.cf.get_form_field().__class__)
+        self.assertQuerysetEqual(ContentType.objects.filter(TestCustomFieldsModel.CONTENT_TYPES),
+                                 ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
+
+    def test_get_formfield_for_field(self):
+        with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.TextField'}):
+            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
+            self.assertIsNotNone(form.get_formfield_for_field(self.cf))
+            self.assertEqual(django.forms.fields.TextField, form.get_formfield_for_field(self.cf).__class__)
+
+    def test_get_widget_for_field(self):
+        with self.settings(CUSTOM_WIDGET_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.widgets.CheckboxInput'}):
+            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
+            self.assertIsNotNone(form.get_widget_for_field(self.cf))
+            self.assertEqual(django.forms.widgets.CheckboxInput, form.get_widget_for_field(self.cf).__class__)
 
     def test_value_creation(self):
         val = CustomValuesModel.objects.create(custom_field=self.cf,

@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
     CUSTOM_TYPE_TIME, CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME, CUSTOM_TYPE_BOOLEAN,
-    CUSTOM_CONTENT_TYPES, CUSTOM_FIELD_TYPES, CUSTOM_WIDGETS_TYPES)
+    settings)
 from .utils import import_class
 
 
@@ -129,7 +129,7 @@ class CustomFieldModelBaseForm(forms.ModelForm):
             pass
         elif field.data_type == CUSTOM_TYPE_BOOLEAN:
             pass
-        field_type = import_class(CUSTOM_FIELD_TYPES[field.data_type])
+        field_type = import_class(settings.CUSTOM_FIELD_TYPES[field.data_type])
         return field_type(**field_attrs)
 
     def get_widget_for_field(self, field, attrs={}):
@@ -140,7 +140,7 @@ class CustomFieldModelBaseForm(forms.ModelForm):
         :param attrs: attributes of widgets
         :return: the widget instance
         """
-        return import_class(CUSTOM_WIDGETS_TYPES[field.data_type])(**attrs)
+        return import_class(settings.CUSTOM_WIDGET_TYPES[field.data_type])(**attrs)
 
     def get_fields_for_content_type(self, content_type):
         """

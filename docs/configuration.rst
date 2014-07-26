@@ -30,7 +30,7 @@ Configuration sample you can use as a start::
     'boolean':  'django.forms.fields.BooleanField',
   }
     
-  CUSTOM_WIDGETS_TYPES = {
+  CUSTOM_WIDGET_TYPES = {
     'text':     'django.contrib.admin.widgets.AdminTextInputWidget',
     'integer':  'django.contrib.admin.widgets.AdminIntegerFieldWidget',
     'float':    'django.contrib.admin.widgets.AdminIntegerFieldWidget',
@@ -81,12 +81,12 @@ It's possible to override which custom form fields are generated for each field 
   }
 
 
-CUSTOM_WIDGETS_TYPES
+CUSTOM_WIDGET_TYPES
 ^^^^^^^^^^^^^^^^^^^^
 
 It's possible to override which custom form fields widgets are generated for each field type when the form is constructed::
 
-  CUSTOM_WIDGETS_TYPES = {
+  CUSTOM_WIDGET_TYPES = {
     'time':     'app.forms.widgets.AdminTimeWidget',
     'date':     'app.forms.widgets.AdminDateWidget',
     'datetime': 'app.forms.widgets.AdminSplitDateTime',

@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, CUSTOM_TYPE_FLOAT,
     CUSTOM_TYPE_TIME, CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME, CUSTOM_TYPE_BOOLEAN,
-    CUSTOM_CONTENT_TYPES, CUSTOM_FIELD_TYPES)
+    settings)
 
 
 #==============================================================================
@@ -39,8 +39,8 @@ class CustomContentType(object):
                 (CUSTOM_TYPE_BOOLEAN,  _('boolean')),
             )
 
-            CONTENT_TYPES = Q(name__in=CUSTOM_CONTENT_TYPES)\
-                if CUSTOM_CONTENT_TYPES is not None else Q()
+            CONTENT_TYPES = Q(name__in=settings.CUSTOM_CONTENT_TYPES)\
+                if settings.CUSTOM_CONTENT_TYPES is not None else Q()
 
             content_type = models.ForeignKey(ContentType,
                                              related_name='custom_fields',
