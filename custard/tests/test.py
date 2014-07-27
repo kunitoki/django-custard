@@ -2,14 +2,16 @@ import django
 #from django.conf import settings
 #from django.core.urlresolvers import reverse
 #from django.db import models
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from custard.conf import CUSTOM_TYPE_TEXT, settings
+from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, settings
 from custard.models import custom
 from custard.forms import CustomFieldModelBaseForm
+from custard.utils import import_class
 
 from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
     CustomFieldsModel, CustomValuesModel)
@@ -53,13 +55,13 @@ class CustomModelsTestCase(TestCase):
 
         self.cf = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
                                                    name='text_field',
-                                                   label='Text field',
+                                                   label="Text field",
                                                    data_type=CUSTOM_TYPE_TEXT)
         self.cf.save()
 
         self.cf2 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
                                                     name='another_text_field',
-                                                    label='Text field 2',
+                                                    label="Text field 2",
                                                     data_type=CUSTOM_TYPE_TEXT,
                                                     required=True,
                                                     searchable=False)
@@ -71,8 +73,11 @@ class CustomModelsTestCase(TestCase):
     def tearDown(self):
         CustomFieldsModel.objects.all().delete()
 
+    def test_import_class(self):
+        self.assertEqual(import_class('custard.forms.CustomFieldModelBaseForm'), CustomFieldModelBaseForm)
+
     @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
-    def test_creation(self):
+    def test_field_creation(self):
         class TestCustomFieldsModel(custom.create_fields()):
             class Meta:
                 app_label = 'tests'
@@ -80,17 +85,46 @@ class CustomModelsTestCase(TestCase):
         self.assertQuerysetEqual(ContentType.objects.filter(TestCustomFieldsModel.CONTENT_TYPES),
                                  ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
 
-    def test_get_formfield_for_field(self):
-        with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.EmailField'}):
-            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
-            self.assertIsNotNone(form.get_formfield_for_field(self.cf))
-            self.assertEqual(django.forms.fields.EmailField, form.get_formfield_for_field(self.cf).__class__)
+    def test_mixin(self):
+        self.assertIn(self.cf, self.obj.get_custom_fields())
+        self.assertEqual(self.cf, self.obj.get_custom_field('text_field'))
 
-    def test_get_widget_for_field(self):
-        with self.settings(CUSTOM_WIDGET_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.widgets.CheckboxInput'}):
-            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
-            self.assertIsNotNone(form.get_widget_for_field(self.cf))
-            self.assertEqual(django.forms.widgets.CheckboxInput, form.get_widget_for_field(self.cf).__class__)
+        val = CustomValuesModel.objects.create(custom_field=self.cf, object_id=self.obj.pk)
+        val.value = "123456"
+        val.save()
+        self.assertEqual("123456", self.obj.get_custom_value('text_field'))
+
+        self.obj.set_custom_value('text_field', "abcdefg")
+        self.assertEqual("abcdefg", self.obj.get_custom_value('text_field'))
+
+        val.delete()
+
+    def test_field_model_clean(self):
+        cf = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                              name='another_text_field',
+                                              label="Text field already present",
+                                              data_type=CUSTOM_TYPE_INTEGER)
+        with self.assertRaises(ValidationError):
+            cf.full_clean()
+
+        cf = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                              name='name',
+                                              label="Text field already in model",
+                                              data_type=CUSTOM_TYPE_TEXT)
+        with self.assertRaises(ValidationError):
+            cf.full_clean()
+
+    def test_value_model_clean(self):
+        val = CustomValuesModel.objects.create(custom_field=self.cf2,
+                                               object_id=self.obj.pk)
+        val.value = "qwertyuiop"
+        val.save()
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf2,
+                                               object_id=self.obj.pk)
+        val.value = "qwertyuiop"
+        with self.assertRaises(ValidationError):
+            val.full_clean()
 
     def test_value_creation(self):
         val = CustomValuesModel.objects.create(custom_field=self.cf,
@@ -138,3 +172,15 @@ class CustomModelsTestCase(TestCase):
 
         qs2 = SimpleModelWithManager.objects.search("67890")
         self.assertQuerysetEqual(qs2, [])
+
+    def test_get_formfield_for_field(self):
+        with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.EmailField'}):
+            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
+            self.assertIsNotNone(form.get_formfield_for_field(self.cf))
+            self.assertEqual(django.forms.fields.EmailField, form.get_formfield_for_field(self.cf).__class__)
+
+    def test_get_widget_for_field(self):
+        with self.settings(CUSTOM_WIDGET_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.widgets.CheckboxInput'}):
+            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
+            self.assertIsNotNone(form.get_widget_for_field(self.cf))
+            self.assertEqual(django.forms.widgets.CheckboxInput, form.get_widget_for_field(self.cf).__class__)
