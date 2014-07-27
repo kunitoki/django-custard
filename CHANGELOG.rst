@@ -4,7 +4,7 @@ Changelog
 Only important changes are mentioned below.
 
 
-v0.6 (2014-07-XX)
+v0.6 (2014-07-27)
 -----------------
 
 * Added support for python 2.6/2.7/3.2 and django 1.5/1.6
