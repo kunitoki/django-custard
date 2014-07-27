@@ -4,6 +4,12 @@ Changelog
 Only important changes are mentioned below.
 
 
+v0.7 (2014-07-XX)
+-----------------
+
+* None
+
+
 v0.6 (2014-07-27)
 -----------------
 
