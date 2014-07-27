@@ -23,8 +23,8 @@ It's possible to edit fields for custom content types by registering a model adm
 The form subclass
 -----------------
 
-First steps to integrate Django Custard with your app admin is to create a subclass
-of ``custard.forms.CustomFieldModelBaseForm`` and implements 3 functions namely:
+First steps to integrate Django Custard with an app admin site is to create a
+subclass of ``custard.forms.CustomFieldModelBaseForm`` and implements 3 functions namely:
 
 ``get_fields_for_content_type(self, content_type)``
     This function will return all fields defined for a specific content type
@@ -66,8 +66,8 @@ Here is an example::
 ModelAdmin
 ----------
 
-In order to use this form, you must specify it as form in your ``ModelAdmin`` class
-for you model::
+In admin site, add this new form as the default for for a ``ModelAdmin`` of any
+model::
 
   class ExampleAdmin(admin.ModelAdmin):
       form = ExampleForm
@@ -75,7 +75,7 @@ for you model::
   admin.site.register(Example, ExampleAdmin)
 
 
-Then the last step is to subclass your model ``change_form.html`` and use the
+Then the last step is to subclass a model ``change_form.html`` and use the
 Django Custard modified version:
 
 ``templates/admin/myapp/example/change_form.html``::
@@ -83,14 +83,14 @@ Django Custard modified version:
   {% extends "custard/admin/change_form.html" %}
 
 
-Then try to go editing a ``Example`` object in admin.
+Then editing ``Example`` object custom fields is enabled in the admin site.
 
 
 Searches in list_view
 ---------------------
 
-In order to enable search custom fields in admin in ``search_fields`` you only
-need to override ``ModelAdmin.get_search_results`` like this::
+In order to enable search custom fields in admin in ``search_fields``, only
+overriding ``ModelAdmin.get_search_results`` is needed::
 
   class ExampleAdmin(admin.ModelAdmin):
       form = ExampleForm

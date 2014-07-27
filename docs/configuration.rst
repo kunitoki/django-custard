@@ -1,7 +1,8 @@
 Configuration
 =============
 
-You can customize Django Custard behaviour by adding ``CUSTOM_*`` configuration variable to your Django project ``settings.py`` file.
+It's possible to customize Django Custard behaviour by adding ``CUSTOM_*``
+configuration variables to a Django project ``settings.py`` file.
 
 Default values are the ones specified in examples.
 
@@ -9,7 +10,7 @@ Default values are the ones specified in examples.
 Full example
 ------------
 
-Configuration sample you can use as a start::
+Configuration sample that can be used as a start::
 
   # Django Custard configuration example
 
@@ -62,7 +63,8 @@ Parameters
 CUSTOM_CONTENT_TYPES
 ^^^^^^^^^^^^^^^^^^^^
 
-Select which content types will have custom fields, the name is the lower model name as it is available in ContentType.model::
+Select which content types will have custom fields, the name is the lower model
+name as it is available in ``ContentType.model`` field::
 
   CUSTOM_CONTENT_TYPES = (
     'mymodelname',
@@ -73,7 +75,8 @@ Select which content types will have custom fields, the name is the lower model 
 CUSTOM_FIELD_TYPES
 ^^^^^^^^^^^^^^^^^^
 
-It's possible to override which custom form fields are generated for each field type when the form is constructed::
+It's possible to override which custom form fields are generated for each field
+type when an instance of ``CustomFieldModelBaseForm`` is constructed::
 
   CUSTOM_FIELD_TYPES = {
     'text':     'app.forms.MySpecialCharField',
@@ -84,7 +87,8 @@ It's possible to override which custom form fields are generated for each field 
 CUSTOM_WIDGET_TYPES
 ^^^^^^^^^^^^^^^^^^^^
 
-It's possible to override which custom form fields widgets are generated for each field type when the form is constructed::
+It's possible to override which custom form fields widgets are generated for each
+field type when an instance of ``CustomFieldModelBaseForm`` is constructed::
 
   CUSTOM_WIDGET_TYPES = {
     'time':     'app.forms.widgets.AdminTimeWidget',

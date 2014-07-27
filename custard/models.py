@@ -271,6 +271,8 @@ class CustomContentType(object):
                 custom_value = self._values_model.objects.get_or_create(custom_field__name=field_name,
                                                                         object_id=self.pk)[0]
                 custom_value.value = value
+                # TODO - must perform a full_clean here ?
+                # custom_value.full_clean()
                 custom_value.save()
                 return custom_value
 

@@ -2,14 +2,15 @@
    :alt: Django Custard
    :target: https://github.com/kunitoki/django-custard
 
-==========================================
-Django runtime customizable generic fields
-==========================================
+==================================
+Django runtime typed custom fields
+==================================
 
-Django Custard is a small reusable `Django <http://www.djangoproject.com>`_ app
-that implements runtime customizable fields that can be attached to any model
-on the fly: add fields from the admin interface and display them in any model,
-even outside of the admin.
+Django Custard is a small reusable unobtrusive `Django <http://www.djangoproject.com>`_
+app that implements runtime custom fields that can be attached to any model on the
+fly: it's possible to create fields and set values for them from the code or
+manage them through the admin site, with the ability to display them even outside
+of the admin.
 
 .. |travis| image:: https://travis-ci.org/kunitoki/django-custard.png?branch=master
    :alt: Build Status - master branch
@@ -53,11 +54,9 @@ Resources
 Installation
 ============
 
-1. You can get Django Custard by using pip or easy_install::
+1. You can get Django Custard by using pip::
 
     pip install django-custard
-    # or
-    easy_install django-custard
 
 2. You will need to add the ``'custard'`` application to the ``INSTALLED_APPS`` setting of your Django project ``settings.py`` file.::
 
@@ -86,8 +85,8 @@ Customization
 Configuration
 -------------
 
-You can customize Django Custard with some ``CUSTOM_*`` configuration variables
-to your Django project ``settings.py`` file.
+Customize Django Custard with some ``CUSTOM_*`` configuration variables in a
+Django project ``settings.py`` file.
 
 .. toctree::
    :maxdepth: 3
@@ -98,6 +97,8 @@ to your Django project ``settings.py`` file.
 Models
 ------
 
+How to work with Django Custard models and helper classes.
+
 .. toctree::
    :maxdepth: 3
 
@@ -107,7 +108,7 @@ Models
 Admin
 -----
 
-Here is the process of integrating Django Custard in admin.
+Process of integrating Django Custard in admin.
 
 .. toctree::
    :maxdepth: 3

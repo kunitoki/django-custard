@@ -5,25 +5,28 @@ Rationale
 ---------
 
 Django Custard comes with a series of internally defined models and classes that
-tries to be as more unobtrusive as possible, so you can extend and make changes
-to its internal models and classes, also by specifying in your explicit app::
+tries to be as more unobtrusive as possible, so to make it possible any kind of
+extension and manipulation of its internal models and classes::
 
   from django.db import models
   from custard.models import custom
 
   class CustomFieldsModel(custom.create_fields()):
-      def foo(self):
-          return "bar"
+      pass
 
   class CustomValuesModel(custom.create_values(CustomFieldsModel)):
-      class Meta:
-          verbose_name = 'custom field value'
-          verbose_name_plural = 'custom field values'
+      pass
 
 
-All models it creates are abstract base models that can also inherit from your
-specific base model class. Think for example when you want all your models to
-subclass of ``django_extensions.db.modelsTimeStampedModel``::
+The Django Custard models that implement custom fields and values are explicitly
+declared as abstract, and not defined anywhere statically in the code. So it's
+possible to implement them in any project, and even have multiple instances of
+them, for example when it's needed to maintain custom fields separation inside
+big apps.
+
+When an application makes use of a standard base model for all its models, like
+when subclassing from ``django_extensions.db.modelsTimeStampedModel``, Django
+Custard models can be constructed with a ``base_model`` class::
 
   from django.db import models
   from custard.models import custom
@@ -36,14 +39,16 @@ subclass of ``django_extensions.db.modelsTimeStampedModel``::
       pass
 
 
-Default for ``base_model`` is ``django.db.models.Model``
+Default for ``base_model`` is ``django.db.models.Model``.
 
 
 Mixin
 -----
 
-When building your models you can attach a special ``Mixin`` that implements
-some helper functions to ease set and get custom field values::
+Custom fields and values attach to an application *real* models. To ease the
+interaction with custom fields, it's possible to attach a special model ``Mixin`` to
+any model for which it is possible to attach custom fields, and gain a simplified
+interface to query and set fields and values::
 
   from django.db import models
   from custard.models import custom
@@ -59,9 +64,11 @@ some helper functions to ease set and get custom field values::
   class CustomValuesModel(custom.create_values(CustomFieldsModel)):
       pass
 
-The Mixin must know which classes are actually implementing the custom fields
-definitions and the custom fields values, so ``custom.create_mixin`` you must
-explicitly specify those model model with the full application label.
+
+The ``Mixin`` must know which classes are actually implementing the custom fields
+definitions and the custom fields values, so to ``custom.create_mixin`` must be
+explicitly specified those models as strings with the full application label, much like
+when implementing ``django.models.fields.ForeignKey`` for externally defined models.
 
 A number of methods are then added to your model:
 
@@ -82,7 +89,7 @@ Manager
 -------
 
 In order to be able to search custom fields flagged as ``searchable`` in models,
-you can create a special manager for your model needs::
+it's possible to add a special manager for any model needs::
 
   from django.db import models
   from custard.models import custom
@@ -103,20 +110,18 @@ you can create a special manager for your model needs::
 
 
 The Manager must know which classes are actually implementing the custom fields
-definitions and the custom fields values, so ``custom.create_manager`` you must
-explicitly specify those model model with the full application label.
+definitions and the custom fields values, so to ``custom.create_manager`` must
+explicitly be specified those models with the full application label.
 
-This way you can add this special kind of manager even to your external apps.
-
-Is then possible to execute the ``search`` method in the model, which will search
-Example instances that contains the search string and returns a queryset much
-like doing a filter call::
+Executing the ``search`` method in the model will then search Example instances
+that contains the search string in any searchable custom field defined for that
+model and returns a queryset much like doing a filter call::
 
   qs = Example.custom.search('foobar')
 
 
-It is also possible to use a specific Manager as base class for your custom
-manager::
+By passing a specific Manager class as ``base_manager`` parameter, the custom
+manager will then inherit from that base class::
 
   from django.db import models
   from custard.models import custom
@@ -136,7 +141,7 @@ manager::
 
 
 .. warning::
-   Be careful to always define a default_manager for you Model named ``objects``.
+   Be careful to always define a default_manager named ``objects`` for any Model.
    If for some reason you omit to do so, you likely will end up in runtime errors
    when you use any class in Django Custard.
 
@@ -168,5 +173,4 @@ It's possible to create fields on the fly for any model and create::
                                                   object_id=Example.objects.get(pk=1).pk)
   custom_value.value = "this is a custom value"
   custom_value.save()
-
 
