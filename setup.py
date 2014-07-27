@@ -9,7 +9,7 @@ setup(
     url='https://github.com/kunitoki/django-custard',
     author='Lucio Asnaghi (aka kunitoki)',
     author_email='kunitoki@gmail.com',
-    description='Django runtime generic customizable fields for any model.',
+    description='Django runtime typed custom fields for any model.',
     long_description=open('README.rst').read(),
     packages=[
         'custard',
