@@ -70,10 +70,10 @@ interface to query and set fields and values::
   class Example(models.Model, CustomMixin):
       name = models.CharField(max_length=255)
 
-  class CustomFieldsModel(custom.create_fields()):
+  class CustomFieldsModel(builder.create_fields()):
       pass
 
-  class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+  class CustomValuesModel(builder.create_values()):
       pass
 
 
@@ -109,10 +109,10 @@ it's possible to add a special manager for any model needs::
 
       objects = CustomManager()
 
-  class CustomFieldsModel(custom.create_fields()):
+  class CustomFieldsModel(builder.create_fields()):
       pass
 
-  class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+  class CustomValuesModel(builder.create_values()):
       pass
 
 
