@@ -38,10 +38,6 @@ of the admin.
 
 |pypi| |travis| |coveralls| |downloads| |pythonversions| |license|
 
-
-Resources
----------
-
 * Home page: https://github.com/kunitoki/django-custard
 * Documentation: http://django-custard.readthedocs.org
 * Pypi: https://pypi.python.org/pypi/django-custard

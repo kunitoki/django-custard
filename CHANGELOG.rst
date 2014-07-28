@@ -4,7 +4,7 @@ Changelog
 Only important changes are mentioned below.
 
 
-v0.7 (2014-07-XX)
+v0.7 (unreleased)
 -----------------
 
 * Moved away from the static custard.models.custom class in favour of custard.builder
