@@ -18,6 +18,6 @@ matrix:
     - python: 2.6
       env: DJANGO=1.6.5
 script:
-  - coverage run --source=custard manage.py test custard
+  - coverage run --timid --source=custard manage.py test custard
 after_success:
   - coveralls
