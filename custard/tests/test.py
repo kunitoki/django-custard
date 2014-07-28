@@ -9,12 +9,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, settings
-from custard.models import custom
+from custard.builder import CustomFieldsBuilder
 from custard.forms import CustomFieldModelBaseForm
 from custard.utils import import_class
 
 from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
-    CustomFieldsModel, CustomValuesModel)
+    CustomFieldsModel, CustomValuesModel, builder)
 
 
 #==============================================================================
@@ -78,11 +78,15 @@ class CustomModelsTestCase(TestCase):
 
     @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
     def test_field_creation(self):
-        class TestCustomFieldsModel(custom.create_fields()):
+        builder2 = CustomFieldsBuilder('tests.CustomFieldsModel',
+                                       'tests.CustomValuesModel',
+                                       settings.CUSTOM_CONTENT_TYPES)
+
+        class TestCustomFieldsModel(builder2.create_fields()):
             class Meta:
                 app_label = 'tests'
 
-        self.assertQuerysetEqual(ContentType.objects.filter(TestCustomFieldsModel.CONTENT_TYPES),
+        self.assertQuerysetEqual(ContentType.objects.filter(builder2.content_types_query),
                                  ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
 
     def test_mixin(self):

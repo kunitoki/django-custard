@@ -1,29 +1,26 @@
 from django.db import models
 
-from custard.models import custom
+from custard.builder import CustomFieldsBuilder
 
 # Create your models here.
 
-CustomModelMixin = custom.create_mixin('demo.CustomFieldsModel', 'demo.CustomValuesModel')
-CustomModelManager = custom.create_manager('demo.CustomFieldsModel', 'demo.CustomValuesModel')
+builder = CustomFieldsBuilder('demo.CustomFieldsModel', 'demo.CustomValuesModel')
+CustomMixinClass = builder.create_mixin()
+CustomManagerClass = builder.create_manager()
 
 
-class Example(models.Model, CustomModelMixin):
+class Example(models.Model, CustomMixinClass):
     name = models.CharField(max_length=255)
 
-    objects = CustomModelManager()
-    
+    objects = CustomManagerClass()
+
     def __str__(self):
         return "%s" % self.name
 
 
-class CustomFieldsModel(custom.create_fields()):
-    class Meta:
-        verbose_name = 'custom field'
-        verbose_name_plural = 'custom fields'
+class CustomFieldsModel(builder.create_fields()):
+    pass
 
 
-class CustomValuesModel(custom.create_values(CustomFieldsModel)):
-    class Meta:
-        verbose_name = 'custom field value'
-        verbose_name_plural = 'custom field values'
+class CustomValuesModel(builder.create_values()):
+    pass

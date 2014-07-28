@@ -6,17 +6,26 @@ Rationale
 
 Django Custard comes with a series of internally defined models and classes that
 tries to be as more unobtrusive as possible, so to make it possible any kind of
-extension and manipulation of its internal models and classes::
+extension and manipulation of its internal models and classes. This is possible
+through the ``custard.builder.CustomFieldsBuilder`` class::
 
   from django.db import models
-  from custard.models import custom
+  from custard.builder import CustomFieldsBuilder
 
-  class CustomFieldsModel(custom.create_fields()):
+  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+
+  class CustomFieldsModel(builder.create_fields()):
       pass
 
-  class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+  class CustomValuesModel(builder.create_values()):
       pass
 
+
+The ``custard.builder.CustomFieldsBuilder`` must know which classes are actually
+implementing the custom fields definitions and the custom fields values, so to
+``custard.builder.CustomFieldsBuilder.__init__`` must be explicitly specified those
+models as strings with the full application label, much like when implementing
+``django.models.fields.ForeignKey`` for externally defined models.
 
 The Django Custard models that implement custom fields and values are explicitly
 declared as abstract, and not defined anywhere statically in the code. So it's
@@ -29,13 +38,15 @@ when subclassing from ``django_extensions.db.modelsTimeStampedModel``, Django
 Custard models can be constructed with a ``base_model`` class::
 
   from django.db import models
-  from custard.models import custom
+  from custard.builder import CustomFieldsBuilder
   from django_extensions.db.models import TimeStampedModel
+
+  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
 
   class CustomFieldsModel(custom.create_fields(base_model=TimeStampedModel)):
       pass
 
-  class CustomValuesModel(custom.create_values(CustomFieldsModel, base_model=TimeStampedModel)):
+  class CustomValuesModel(custom.create_values(base_model=TimeStampedModel)):
       pass
 
 
@@ -51,9 +62,10 @@ any model for which it is possible to attach custom fields, and gain a simplifie
 interface to query and set fields and values::
 
   from django.db import models
-  from custard.models import custom
+  from custard.builder import CustomFieldsBuilder
 
-  CustomMixin = custom.create_mixin('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+  CustomMixin = builder.create_mixin()
 
   class Example(models.Model, CustomMixin):
       name = models.CharField(max_length=255)
@@ -64,11 +76,6 @@ interface to query and set fields and values::
   class CustomValuesModel(custom.create_values(CustomFieldsModel)):
       pass
 
-
-The ``Mixin`` must know which classes are actually implementing the custom fields
-definitions and the custom fields values, so to ``custom.create_mixin`` must be
-explicitly specified those models as strings with the full application label, much like
-when implementing ``django.models.fields.ForeignKey`` for externally defined models.
 
 A number of methods are then added to your model:
 
@@ -92,15 +99,15 @@ In order to be able to search custom fields flagged as ``searchable`` in models,
 it's possible to add a special manager for any model needs::
 
   from django.db import models
-  from custard.models import custom
+  from custard.builder import CustomFieldsBuilder
 
-  CustomManager = custom.create_manager('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+  CustomManager = builder.create_manager()
 
   class Example(models.Model):
       name = models.CharField(max_length=255)
 
-      objects = models.Manager()
-      custom = CustomManager()
+      objects = CustomManager()
 
   class CustomFieldsModel(custom.create_fields()):
       pass
@@ -108,10 +115,6 @@ it's possible to add a special manager for any model needs::
   class CustomValuesModel(custom.create_values(CustomFieldsModel)):
       pass
 
-
-The Manager must know which classes are actually implementing the custom fields
-definitions and the custom fields values, so to ``custom.create_manager`` must
-explicitly be specified those models with the full application label.
 
 Executing the ``search`` method in the model will then search Example instances
 that contains the search string in any searchable custom field defined for that
@@ -124,15 +127,15 @@ By passing a specific Manager class as ``base_manager`` parameter, the custom
 manager will then inherit from that base class::
 
   from django.db import models
-  from custard.models import custom
+  from custard.builder import CustomFieldsBuilder
+
+  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
 
   class MyUberManager(models.Manager):
       def super_duper(self):
           return None
 
-  CustomManager = custom.create_manager('myapp.CustomFieldsModel',
-                                        'myapp.CustomValuesModel',
-                                        base_manager=MyUberManager)
+  CustomManager = builder.create_manager(base_manager=MyUberManager)
 
   class Example(models.Model):
       objects = CustomManager()
@@ -153,7 +156,6 @@ It's possible to create fields on the fly for any model and create::
 
   from django.contrib.contenttypes.models import ContentType
   from custard.conf import CUSTOM_TYPE_TEXT
-  from custard.models import custom
 
   from .models import Example, CustomFieldsModel, CustomValuesModel
 

@@ -6,6 +6,8 @@ from .models import Example, CustomFieldsModel, CustomValuesModel
 
 
 class ExampleForm(CustomFieldModelBaseForm):
+    class Meta:
+        model = Example
 
     def __init__(self, *args, **kwargs):
         super(ExampleForm, self).__init__(*args, **kwargs)
@@ -22,9 +24,6 @@ class ExampleForm(CustomFieldModelBaseForm):
 
     def get_fields_for_content_type(self, content_type):
         return CustomFieldsModel.objects.filter(content_type=content_type)
-
-    class Meta:
-        model = Example
 
 
 class ExampleAdmin(admin.ModelAdmin):

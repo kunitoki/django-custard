@@ -7,7 +7,9 @@ Only important changes are mentioned below.
 v0.7 (2014-07-XX)
 -----------------
 
-* None
+* Moved away from the static custard.models.custom class in favour of custard.builder
+* Simplified a bit how to determine the classes in the builder
+* Updated tests and example to the new builder methods
 
 
 v0.6 (2014-07-27)

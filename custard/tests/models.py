@@ -1,18 +1,12 @@
 from django.db import models
 
-from custard.models import custom
+from custard.builder import CustomFieldsBuilder
 
-CustomMixin = custom.create_mixin('tests.CustomFieldsModel', 'tests.CustomValuesModel')
-CustomManager = custom.create_manager('tests.CustomFieldsModel', 'tests.CustomValuesModel')
+# Create your models here.
 
-class SimpleModelNotRegistered(models.Model):
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        app_label = 'tests'
-
-    def __str__(self):
-        return "%s" % self.name
+builder = CustomFieldsBuilder('tests.CustomFieldsModel', 'tests.CustomValuesModel')
+CustomMixinClass = builder.create_mixin()
+CustomManagerClass = builder.create_manager()
 
 
 class SimpleModelWithoutManager(models.Model):
@@ -25,10 +19,10 @@ class SimpleModelWithoutManager(models.Model):
         return "%s" % self.name
 
 
-class SimpleModelWithManager(models.Model, CustomMixin):
+class SimpleModelWithManager(models.Model, CustomMixinClass):
     name = models.CharField(max_length=255)
 
-    objects = CustomManager()
+    objects = CustomManagerClass()
 
     class Meta:
         app_label = 'tests'
@@ -37,10 +31,10 @@ class SimpleModelWithManager(models.Model, CustomMixin):
         return "%s" % self.name
 
 
-class CustomFieldsModel(custom.create_fields()):
+class CustomFieldsModel(builder.create_fields()):
     class Meta:
         app_label = 'tests'
 
-class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+class CustomValuesModel(builder.create_values()):
     class Meta:
         app_label = 'tests'
