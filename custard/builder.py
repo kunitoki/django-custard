@@ -90,7 +90,7 @@ class CustomFieldsBuilder(object):
             max_value = models.FloatField(_('max value'), blank=True, null=True)
 
             class Meta:
-                #unique_together = ('content_type', 'name')
+                unique_together = ('content_type', 'name')
                 verbose_name = _('custom field')
                 verbose_name_plural = _('custom fields')
                 abstract = True
@@ -171,7 +171,7 @@ class CustomFieldsBuilder(object):
             value = property(_get_value, _set_value)
 
             class Meta:
-                #unique_together = ('custom_field', 'content_type', 'object_id')
+                unique_together = ('custom_field', 'content_type', 'object_id')
                 verbose_name = _('custom field value')
                 verbose_name_plural = _('custom field values')
                 abstract = True
@@ -193,7 +193,7 @@ class CustomFieldsBuilder(object):
                     raise ValidationError({ NON_FIELD_ERRORS: (_('A value for this custom field already exists'),) })
 
             def __str__(self):
-                return "%s(%s): %s" % (self.custom_field.name, self.object_id, self.value)
+                return "%s: %s" % (self.custom_field.name, self.value)
 
         return CustomContentTypeFieldValue
 
@@ -254,7 +254,12 @@ class CustomFieldsBuilder(object):
         class CustomModelMixin(object):
             @cached_property
             def _content_type(self):
-                return ContentType.objects.get_for_model(self.__class__)
+                return ContentType.objects.get_for_model(self)
+
+            @classmethod
+            def get_model_custom_fields(cls):
+                """ Return a list of custom fields for this model, callable at model level """
+                return _builder.fields_model_class.objects.filter(content_type=ContentType.objects.get_for_model(cls))
 
             def get_custom_fields(self):
                 """ Return a list of custom fields for this model """
@@ -267,14 +272,17 @@ class CustomFieldsBuilder(object):
 
             def get_custom_value(self, field_name):
                 """ Get a value for a specified custom field """
-                return _builder.values_model_class.objects.get(custom_field__name=field_name,
-                                                               content_type=self._content_type,
-                                                               object_id=self.pk).value
+                custom_value, created = \
+                    _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
+                                                                      content_type=self._content_type,
+                                                                      object_id=self.pk)
+                return custom_value.value
 
             def set_custom_value(self, field_name, value):
                 """ Set a value for a specified custom field """
-                custom_value = _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
-                                                                                 object_id=self.pk)[0]
+                custom_value, created = \
+                    _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
+                                                                      object_id=self.pk)
                 custom_value.value = value
                 # TODO - must perform a full_clean here ?
                 # custom_value.full_clean()
@@ -283,7 +291,10 @@ class CustomFieldsBuilder(object):
 
         return CustomModelMixin
 
-    def create_modelform(self, base_form=forms.ModelForm):
+
+    def create_modelform(self, base_form=forms.ModelForm,
+                         field_types=settings.CUSTOM_FIELD_TYPES,
+                         widget_types=settings.CUSTOM_WIDGET_TYPES):
         """
         This creates the class that implements a ModelForm that knows about
         the custom fields
@@ -332,6 +343,7 @@ class CustomFieldsBuilder(object):
                     initial = f.initial
                     self.fields[name] = self.get_formfield_for_field(f)
                     self.fields[name].is_custom = True
+                    self.fields[name].label = f.label
                     self.fields[name].required = f.required
                     self.fields[name].widget = self.get_widget_for_field(f)
                     if self.instance and self.instance.pk:
@@ -412,7 +424,7 @@ class CustomFieldsBuilder(object):
                     pass
                 elif field.data_type == CUSTOM_TYPE_BOOLEAN:
                     pass
-                field_type = import_class(settings.CUSTOM_FIELD_TYPES[field.data_type])
+                field_type = import_class(field_types[field.data_type])
                 return field_type(**field_attrs)
 
             def get_widget_for_field(self, field, attrs={}):
@@ -423,7 +435,7 @@ class CustomFieldsBuilder(object):
                 :param attrs: attributes of widgets
                 :return: the widget instance
                 """
-                return import_class(settings.CUSTOM_WIDGET_TYPES[field.data_type])(**attrs)
+                return import_class(widget_types[field.data_type])(**attrs)
 
             def get_fields_for_content_type(self, content_type):
                 """
@@ -479,3 +491,4 @@ class CustomFieldsBuilder(object):
                                                                   value=value)
 
         return CustomFieldModelBaseForm
+

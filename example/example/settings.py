@@ -89,6 +89,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+# Django-Suit support
+try:
+    import suit
+    from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+    INSTALLED_APPS = ('suit',) + INSTALLED_APPS
+    TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+        'django.core.context_processors.request',
+    )
+except ImportError:
+    pass
+
+
 # Custard configuration
 
 CUSTOM_CONTENT_TYPES = (

@@ -77,6 +77,7 @@ class CustomModelsTestCase(TestCase):
 
     def test_mixin(self):
         self.assertIn(self.cf, self.obj.get_custom_fields())
+        self.assertIn(self.cf, SimpleModelWithManager.get_model_custom_fields())
         self.assertEqual(self.cf, self.obj.get_custom_field('text_field'))
 
         val = CustomValuesModel.objects.create(custom_field=self.cf, object_id=self.obj.pk)
@@ -165,12 +166,24 @@ class CustomModelsTestCase(TestCase):
 
     def test_get_formfield_for_field(self):
         with self.settings(CUSTOM_FIELD_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.fields.EmailField'}):
-            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
+            builder2 = CustomFieldsBuilder('tests.CustomFieldsModel', 'tests.CustomValuesModel')
+
+            class SimpleModelWithManagerForm2(builder2.create_modelform(field_types=settings.CUSTOM_FIELD_TYPES)):
+                class Meta:
+                    model = SimpleModelWithManager
+
+            form = SimpleModelWithManagerForm2(data={}, instance=self.obj)
             self.assertIsNotNone(form.get_formfield_for_field(self.cf))
             self.assertEqual(django.forms.fields.EmailField, form.get_formfield_for_field(self.cf).__class__)
 
     def test_get_widget_for_field(self):
         with self.settings(CUSTOM_WIDGET_TYPES={CUSTOM_TYPE_TEXT: 'django.forms.widgets.CheckboxInput'}):
-            form = SimpleModelWithManagerForm(data={}, instance=self.obj)
+            builder2 = CustomFieldsBuilder('tests.CustomFieldsModel', 'tests.CustomValuesModel')
+
+            class SimpleModelWithManagerForm2(builder2.create_modelform(widget_types=settings.CUSTOM_WIDGET_TYPES)):
+                class Meta:
+                    model = SimpleModelWithManager
+
+            form = SimpleModelWithManagerForm2(data={}, instance=self.obj)
             self.assertIsNotNone(form.get_widget_for_field(self.cf))
             self.assertEqual(django.forms.widgets.CheckboxInput, form.get_widget_for_field(self.cf).__class__)
