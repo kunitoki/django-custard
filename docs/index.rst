@@ -68,14 +68,16 @@ Installation
 
 3. In a ``models.py`` file in your app you should just add the 2 models responsible of holding the custom fields type and values.::
 
-    from custard.models import custom
+    from custard.builder import CustomFieldsBuilder
+
+    builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
 
     ...
 
-    class CustomFieldsModel(custom.create_fields()):
+    class CustomFieldsModel(builder.create_fields()):
         pass
 
-    class CustomValuesModel(custom.create_values(CustomFieldsModel)):
+    class CustomValuesModel(builder.create_values()):
         pass
 
 
