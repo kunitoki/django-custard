@@ -1,29 +1,11 @@
 from django.contrib import admin
 
-from custard.forms import CustomFieldModelBaseForm
-
-from .models import Example, CustomFieldsModel, CustomValuesModel
+from .models import Example, CustomFieldsModel, CustomValuesModel, builder
 
 
-class ExampleForm(CustomFieldModelBaseForm):
+class ExampleForm(builder.create_modelform()):
     class Meta:
         model = Example
-
-    def __init__(self, *args, **kwargs):
-        super(ExampleForm, self).__init__(*args, **kwargs)
- 
-    def search_value_for_field(self, field, content_type, object_id):
-        return CustomValuesModel.objects.filter(custom_field=field,
-                                                content_type=content_type,
-                                                object_id=object_id)
-
-    def create_value_for_field(self, field, object_id, value):
-        return CustomValuesModel(custom_field=field,
-                                 object_id=object_id,
-                                 value=value)
-
-    def get_fields_for_content_type(self, content_type):
-        return CustomFieldsModel.objects.filter(content_type=content_type)
 
 
 class ExampleAdmin(admin.ModelAdmin):

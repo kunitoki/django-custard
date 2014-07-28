@@ -10,7 +10,6 @@ from django.test.utils import override_settings
 
 from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, settings
 from custard.builder import CustomFieldsBuilder
-from custard.forms import CustomFieldModelBaseForm
 from custard.utils import import_class
 
 from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
@@ -18,22 +17,9 @@ from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
 
 
 #==============================================================================
-class SimpleModelWithManagerForm(CustomFieldModelBaseForm):
+class SimpleModelWithManagerForm(builder.create_modelform()):
     class Meta:
         model = SimpleModelWithManager
-
-    def get_fields_for_content_type(self, content_type):
-        return CustomFieldsModel.objects.filter(content_type=content_type)
-
-    def search_value_for_field(self, field, content_type, object_id):
-        return CustomValuesModel.objects.filter(custom_field=field,
-                                                content_type=content_type,
-                                                object_id=object_id)
-
-    def create_value_for_field(self, field, object_id, value):
-        return CustomValuesModel(custom_field=field,
-                                 object_id=object_id,
-                                 value=value)
 
 #class ExampleAdmin(admin.ModelAdmin):
 #    form = ExampleForm
@@ -74,7 +60,7 @@ class CustomModelsTestCase(TestCase):
         CustomFieldsModel.objects.all().delete()
 
     def test_import_class(self):
-        self.assertEqual(import_class('custard.forms.CustomFieldModelBaseForm'), CustomFieldModelBaseForm)
+        self.assertEqual(import_class('custard.builder.CustomFieldsBuilder'), CustomFieldsBuilder)
 
     @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
     def test_field_creation(self):

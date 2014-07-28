@@ -23,8 +23,21 @@ It's possible to edit fields for custom content types by registering a model adm
 The form subclass
 -----------------
 
-First steps to integrate Django Custard with an app admin site is to create a
-subclass of ``custard.forms.CustomFieldModelBaseForm`` and implements 3 functions namely:
+In order to integrate Django Custard with an app admin site is to create the
+custom ModelForm using ``builder.create_modelform``::
+
+  from django.contrib import admin
+
+  from .models import Example, CustomFieldsModel, CustomValuesModel, builder
+
+  class ExampleForm(builder.create_modelform()):
+      class Meta:
+          model = Example
+
+
+It's possible to subclass the form and override 3 functions to specify even more
+the search for custom fields and values (for example when filtering with User
+or Group, so multiple cutom fields can be enable for each User or Group independently):
 
 ``get_fields_for_content_type(self, content_type)``
     This function will return all fields defined for a specific content type
@@ -38,11 +51,10 @@ subclass of ``custard.forms.CustomFieldModelBaseForm`` and implements 3 function
 Here is an example::
 
   from django.contrib import admin
-  from custard.forms import CustomFieldModelBaseForm
 
-  from .models import Example, CustomFieldsModel, CustomValuesModel
+  from .models import Example, CustomFieldsModel, CustomValuesModel, builder
 
-  class ExampleForm(CustomFieldModelBaseForm):
+  class ExampleForm(builder.create_modelform()):
       class Meta:
           model = Example
 
