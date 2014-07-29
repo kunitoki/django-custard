@@ -492,6 +492,7 @@ class CustomFieldsBuilder(object):
 
         return CustomFieldModelBaseForm
 
+
     def create_modeladmin(self, base_admin=admin.ModelAdmin):
         """
         This creates the class that implements a ModelForm that knows about
