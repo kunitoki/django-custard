@@ -4,10 +4,11 @@ Changelog
 Only important changes are mentioned below.
 
 
-v0.7 (unreleased)
+v0.7 (2014-07-29)
 -----------------
 
 * Moved away from the static custard.models.custom class in favour of custard.builder
+* Enable search of custom fields in admin without hacks
 * Simplified a bit how to determine the classes in the builder
 * Updated tests and example to the new builder methods
 
