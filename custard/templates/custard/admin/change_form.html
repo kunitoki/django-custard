@@ -1,8 +1,14 @@
 {% extends "admin/change_form.html" %}
 {% load i18n %}
+{% load custard_tags %}
 
 {% block after_field_sets %}
+{% if adminform.form.is_custom_form %}
 <fieldset class="module aligned{% if adminform.form.custom_classes %} {{ adminform.form.custom_classes }}{% endif %}">
+    {% if adminform.form.custom_name %}<h2>{{ adminform.form.custom_name }}</h2>{% endif %}
+    {% if adminform.form.custom_description %}
+        <div class="description">{{ adminform.form.custom_description|safe }}</div>
+    {% endif %}
     {% for field in adminform.form %}
         {% if field.field.is_custom %}
         <div class="control-group form-row">
@@ -26,4 +32,5 @@
         {% endif %}
     {% endfor %}
 </fieldset>
+{% endif %}
 {% endblock %}

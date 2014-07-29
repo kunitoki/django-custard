@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.loading import get_model
 from django import forms
+from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -307,8 +308,7 @@ class CustomFieldsBuilder(object):
 
         class CustomFieldModelBaseForm(base_form):
             def __init__(self, *args, **kwargs):
-                # additional form variables
-                self.custom_classes = None
+                self.is_custom_form = True
 
                 # construct the form
                 super(CustomFieldModelBaseForm, self).__init__(*args, **kwargs)
@@ -492,3 +492,19 @@ class CustomFieldsBuilder(object):
 
         return CustomFieldModelBaseForm
 
+    def create_modeladmin(self, base_admin=admin.ModelAdmin):
+        """
+        This creates the class that implements a ModelForm that knows about
+        the custom fields
+
+        :param base_form:
+        :return:
+        """
+
+        _builder = self
+
+        class CustomFieldModelBaseAdmin(base_admin):
+            def __init__(self, *args, **kwargs):
+                super(CustomFieldModelBaseAdmin, self).__init__(*args, **kwargs)
+
+        return CustomFieldModelBaseAdmin
