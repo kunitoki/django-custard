@@ -4,6 +4,10 @@ Changelog
 Only important changes are mentioned below.
 
 
+v0.8 (unreleased)
+-----------------
+
+
 v0.7 (2014-07-29)
 -----------------
 
