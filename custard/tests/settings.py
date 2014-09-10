@@ -55,5 +55,7 @@ INSTALLED_APPS = (
     'custard.tests',
 )
 
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
 STATIC_URL = '/static/'
 

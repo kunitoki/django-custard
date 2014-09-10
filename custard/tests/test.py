@@ -20,6 +20,7 @@ from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
 class SimpleModelWithManagerForm(builder.create_modelform()):
     class Meta:
         model = SimpleModelWithManager
+        fields = '__all__'
 
 #class ExampleAdmin(admin.ModelAdmin):
 #    form = ExampleForm
@@ -171,6 +172,7 @@ class CustomModelsTestCase(TestCase):
             class SimpleModelWithManagerForm2(builder2.create_modelform(field_types=settings.CUSTOM_FIELD_TYPES)):
                 class Meta:
                     model = SimpleModelWithManager
+                    fields = '__all__'
 
             form = SimpleModelWithManagerForm2(data={}, instance=self.obj)
             self.assertIsNotNone(form.get_formfield_for_field(self.cf))
