@@ -44,4 +44,4 @@ of the admin.
 * Example app on Github: https://github.com/kunitoki/django-custard/example
 * Changelog: `Changelog.rst <https://github.com/kunitoki/django-custard/blob/master/CHANGELOG.rst>`_
 * License: `The MIT License (MIT) <http://opensource.org/licenses/MIT>`_
-* Supports: Django 1.5, 1.6 - Python 2.6, 2.7, 3.2
+* Supports: Django 1.6, 1.7 - Python 2.7, 3.2

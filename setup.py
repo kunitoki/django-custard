@@ -19,7 +19,7 @@ setup(
         'custard': ['templates/custard/admin/*.html'],
     },
     install_requires=[
-        "Django >= 1.5",
+        "Django >= 1.6",
     ],
     keywords=[
         'django',
@@ -36,9 +36,10 @@ setup(
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Environment :: Web Environment',
         'Topic :: Software Development',
     ]
