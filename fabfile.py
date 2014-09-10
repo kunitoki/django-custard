@@ -50,18 +50,21 @@ def pypi_upload(where="pypitest"):
 @task
 def create_release(version=None):
     with lcd("."):
+        version_todo = __version__
+
         # update version file if present
         if version is not None:
-            local("sed -ie 's/[0-9]*\.[0-9]*/%s/' custard/__init__.py" % version)
-            local("git commit -a -m 'Bump release %s'" % version)
+            version_todo = version
+            local("sed -ie 's/[0-9]*\.[0-9]*/%s/' custard/__init__.py" % version_todo)
+            local("git commit -a -m 'Bump release %s'" % version_todo)
             local("git push")
 
         # remove tag if present
         with settings(warn_only=True):
-            local("git tag -d %s && git push origin :refs/tags/%s" % (__version__, __version__))
+            local("git tag -d %s && git push origin :refs/tags/%s" % (version_todo, version_todo))
 
         # create tag
-        local("git tag %s" % __version__)
+        local("git tag %s" % version_todo)
         local("git push --tags")
 
         # register with pypi and upload
