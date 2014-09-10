@@ -312,6 +312,7 @@ class CustomFieldsBuilder(object):
                 """
                 # additional form variables
                 self.custom_classes = None
+                self.is_custom_form = True
 
                 # construct the form
                 super(CustomFieldModelBaseForm, self).__init__(*args, **kwargs)
@@ -362,9 +363,7 @@ class CustomFieldsBuilder(object):
                     self.fields[name].initial = self.initial[name] = initial
 
             def save_custom_fields(self):
-                """
-                Perform save and validation over the custom fields
-                """
+                """ Perform save and validation over the custom fields """
                 content_type = self.get_content_type()
                 fields = self.get_fields_for_content_type(content_type)
                 for f in fields:
@@ -500,3 +499,21 @@ class CustomFieldsBuilder(object):
                                                                   value=value)
 
         return CustomFieldModelBaseForm
+
+
+    def create_modeladmin(self, base_admin=admin.ModelAdmin):
+        """
+        This creates the class that implements a ModelForm that knows about
+        the custom fields
+
+        :param base_form:
+        :return:
+        """
+
+        _builder = self
+
+        class CustomFieldModelBaseAdmin(base_admin):
+            def __init__(self, *args, **kwargs):
+                super(CustomFieldModelBaseAdmin, self).__init__(*args, **kwargs)
+
+        return CustomFieldModelBaseAdmin

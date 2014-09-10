@@ -31,6 +31,10 @@ custom ModelForm using ``builder.create_modelform``::
   from .models import Example, CustomFieldsModel, CustomValuesModel, builder
 
   class ExampleForm(builder.create_modelform()):
+      custom_name = 'My Custom Fields'
+      custom_description = 'Edit the Example custom fields here'
+      custom_classes = ''
+
       class Meta:
           model = Example
 
@@ -49,10 +53,6 @@ or Group, so multiple cutom fields can be enable for each User or Group independ
     This function will create a value of the given field of a given content type object
 
 Here is an example::
-
-  from django.contrib import admin
-
-  from .models import Example, CustomFieldsModel, CustomValuesModel, builder
 
   class ExampleForm(builder.create_modelform()):
       class Meta:
@@ -81,7 +81,7 @@ ModelAdmin
 In admin site, add this new form as the default for for a ``ModelAdmin`` of any
 model::
 
-  class ExampleAdmin(admin.ModelAdmin):
+  class ExampleAdmin(builder.create_modeladmin()):
       form = ExampleForm
 
   admin.site.register(Example, ExampleAdmin)
@@ -104,7 +104,7 @@ Searches in list_view
 In order to enable search custom fields in admin in ``search_fields``, only
 overriding ``ModelAdmin.get_search_results`` is needed::
 
-  class ExampleAdmin(admin.ModelAdmin):
+  class ExampleAdmin(builder.create_modeladmin()):
       form = ExampleForm
 
       def get_search_results(self, request, queryset, search_term):
@@ -120,4 +120,16 @@ overriding ``ModelAdmin.get_search_results`` is needed::
 .. note::
     This implies you have overridden your default ``objects`` manager in ``Example`` model
     with the manager that comes with Django Custard.
+
+
+Then the last step is to subclass a model ``change_list.html`` and use the
+Django Custard modified version for search:
+
+``templates/admin/myapp/example/change_list.html``::
+
+  {% extends "admin/change_list.html" %}
+  {% block search %}
+    {% include "custard/admin/search_form.html" %}
+  {% endblock %}
+
 

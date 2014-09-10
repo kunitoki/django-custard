@@ -90,6 +90,7 @@ STATIC_URL = '/static/'
 
 
 # Django-Suit support
+
 try:
     import suit
     from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
@@ -106,5 +107,4 @@ except ImportError:
 CUSTOM_CONTENT_TYPES = (
     'example',
     'user',
-    'group',
 )
