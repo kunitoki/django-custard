@@ -1,10 +1,10 @@
 from setuptools import setup
 
-from custard import VERSION
+from custard import __version__
 
 setup(
     name='django-custard',
-    version=VERSION,
+    version=__version__,
     license='MIT',
     url='https://github.com/kunitoki/django-custard',
     author='Lucio Asnaghi (aka kunitoki)',

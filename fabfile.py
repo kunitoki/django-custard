@@ -2,7 +2,7 @@
 
 from fabric.api import env, task, cd, lcd, run, local, settings
 
-from custard import VERSION
+from custard import __version__
 
 env.hosts = ['localhost']
 
@@ -58,10 +58,10 @@ def create_release(version=None):
 
         # remove tag if present
         with settings(warn_only=True):
-            local("git tag -d %s && git push origin :refs/tags/%s" % (VERSION, VERSION))
+            local("git tag -d %s && git push origin :refs/tags/%s" % (__version__, __version__))
 
         # create tag
-        local("git tag %s" % VERSION)
+        local("git tag %s" % __version__)
         local("git push --tags")
 
         # register with pypi and upload

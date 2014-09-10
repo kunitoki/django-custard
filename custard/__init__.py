@@ -1,1 +1,2 @@
-VERSION = '0.7'
+__author__ = 'kraken'
+__version__ = '0.7'
