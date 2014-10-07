@@ -9,7 +9,10 @@ from django.test import TestCase, Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, settings
+from custard.conf import (CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER,
+                          CUSTOM_TYPE_BOOLEAN, CUSTOM_TYPE_FLOAT,
+                          CUSTOM_TYPE_DATE, CUSTOM_TYPE_DATETIME,
+                          CUSTOM_TYPE_TIME, settings)
 from custard.builder import CustomFieldsBuilder
 from custard.utils import import_class
 
@@ -55,7 +58,38 @@ class CustomModelsTestCase(TestCase):
                                                     data_type=CUSTOM_TYPE_TEXT,
                                                     required=True,
                                                     searchable=False)
+        self.cf2.clean()
         self.cf2.save()
+
+        self.cf3 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                                    name='int_field', label="Integer field",
+                                                    data_type=CUSTOM_TYPE_INTEGER)
+        self.cf3.save()
+
+        self.cf4 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                                    name='boolean_field', label="Boolean field",
+                                                    data_type=CUSTOM_TYPE_BOOLEAN)
+        self.cf4.save()
+
+        self.cf5 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                                    name='float_field', label="Float field",
+                                                    data_type=CUSTOM_TYPE_FLOAT)
+        self.cf5.save()
+
+        self.cf6 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                                    name='date_field', label="Date field",
+                                                    data_type=CUSTOM_TYPE_DATE)
+        self.cf6.save()
+
+        self.cf7 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                                    name='datetime_field', label="Datetime field",
+                                                    data_type=CUSTOM_TYPE_DATETIME)
+        self.cf7.save()
+
+        self.cf8 = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
+                                                    name='time_field', label="Time field",
+                                                    data_type=CUSTOM_TYPE_TIME)
+        self.cf8.save()
 
         self.obj = SimpleModelWithManager.objects.create(name='old test')
         self.obj.save()
@@ -229,7 +263,8 @@ class CustomModelsTestCase(TestCase):
         #self.assertInHTML(TestForm.custom_classes, form.as_p())
 
     def test_admin(self):
-        c = Client()
-        if c.login(username='fred', password='secret'):
-            response = c.get('/admin/', follow=True)
-            print(response)
+        modeladmin_class = builder.create_modeladmin()
+        #c = Client()
+        #if c.login(username='fred', password='secret'):
+        #    response = c.get('/admin/', follow=True)
+        #    print(response)
