@@ -496,9 +496,9 @@ class CustomFieldsBuilder(object):
                 :param value: the value to set
                 :return: the value instance (not saved!)
                 """
-                return _builder.values_model_class.objects.filter(custom_field=field,
-                                                                  object_id=object_id,
-                                                                  value=value)
+                return _builder.values_model_class(custom_field=field,
+                                                   object_id=object_id,
+                                                   value=value)
 
         return CustomFieldModelBaseForm
 

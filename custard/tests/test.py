@@ -5,7 +5,8 @@ import django
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from custard.conf import CUSTOM_TYPE_TEXT, CUSTOM_TYPE_INTEGER, settings
@@ -37,6 +38,8 @@ class SimpleModelWithManagerForm(builder.create_modelform()):
 class CustomModelsTestCase(TestCase):
         
     def setUp(self):
+        self.factory = RequestFactory()
+
         self.simple_with_manager_ct = ContentType.objects.get_for_model(SimpleModelWithManager)
         self.simple_without_manager_ct = ContentType.objects.get_for_model(SimpleModelWithoutManager)
 
@@ -62,6 +65,14 @@ class CustomModelsTestCase(TestCase):
 
     def test_import_class(self):
         self.assertEqual(import_class('custard.builder.CustomFieldsBuilder'), CustomFieldsBuilder)
+
+    def test_model_repr(self):
+        self.assertEqual(repr(self.cf), "<CustomFieldsModel: text_field>")
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf, object_id=self.obj.pk)
+        val.value = "abcdefg"
+        val.save()
+        self.assertEqual(repr(val), "<CustomValuesModel: text_field: abcdefg>")
 
     @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
     def test_field_creation(self):
@@ -189,3 +200,36 @@ class CustomModelsTestCase(TestCase):
             form = SimpleModelWithManagerForm2(data={}, instance=self.obj)
             self.assertIsNotNone(form.get_widget_for_field(self.cf))
             self.assertEqual(django.forms.widgets.CheckboxInput, form.get_widget_for_field(self.cf).__class__)
+
+    def test_form(self):
+        class TestForm(builder.create_modelform()):
+            custom_name = 'My Custom Fields'
+            custom_description = 'Edit the Example custom fields here'
+            custom_classes = 'zzzap-class'
+            class Meta:
+                model = SimpleModelWithManager
+
+        request = self.factory.post('/', { 'text_field': '123' })
+        form = TestForm(request.POST, instance=self.obj)
+        self.assertFalse(form.is_valid())
+        self.assertIn('another_text_field', form.errors)
+        self.assertRaises(ValueError, lambda: form.save())
+
+        request = self.factory.post('/', { 'id': self.obj.pk,
+                                           'name': 'xxx',
+                                           'another_text_field': 'wwwzzzyyyxxx' })
+        form = TestForm(request.POST, instance=self.obj)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(self.obj.get_custom_value('another_text_field'), 'wwwzzzyyyxxx')
+        self.assertEqual(self.obj.name, 'xxx')
+
+        #self.assertInHTML(TestForm.custom_name, form.as_p())
+        #self.assertInHTML(TestForm.custom_description, form.as_p())
+        #self.assertInHTML(TestForm.custom_classes, form.as_p())
+
+    def test_admin(self):
+        c = Client()
+        if c.login(username='fred', password='secret'):
+            response = c.get('/admin/', follow=True)
+            print(response)
