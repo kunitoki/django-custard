@@ -236,6 +236,7 @@ class CustomModelsTestCase(TestCase):
 
             class SimpleModelWithManagerForm2(builder2.create_modelform(widget_types=settings.CUSTOM_WIDGET_TYPES)):
                 class Meta:
+                    fields = '__all__'
                     model = SimpleModelWithManager
 
             form = SimpleModelWithManagerForm2(data={}, instance=self.obj)
@@ -248,6 +249,7 @@ class CustomModelsTestCase(TestCase):
             custom_description = 'Edit the Example custom fields here'
             custom_classes = 'zzzap-class'
             class Meta:
+                fields = '__all__'
                 model = SimpleModelWithManager
 
         request = self.factory.post('/', { 'text_field': '123' })
