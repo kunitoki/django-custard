@@ -3,15 +3,19 @@ Changelog
 
 Only important changes are mentioned below.
 
-
-v0.8 (2014-10-08)
+v0.9 (unreleased)
 -----------------
-* Fixed https://github.com/kunitoki/django-custard/issues/1
-* More tests
-* More coverage
 
 * Added ability to pass "value" in CustomValuesModel.objects.create
 * Fixed tests
+
+
+v0.8 (2014-10-08)
+-----------------
+
+* Fixed https://github.com/kunitoki/django-custard/issues/1
+* More tests
+* More coverage
 
 
 v0.7 (2014-07-29)
