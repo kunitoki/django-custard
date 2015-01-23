@@ -103,8 +103,9 @@ class CustomModelsTestCase(TestCase):
     def test_model_repr(self):
         self.assertEqual(repr(self.cf), "<CustomFieldsModel: text_field>")
 
-        val = CustomValuesModel.objects.create(custom_field=self.cf, object_id=self.obj.pk)
-        val.value = "abcdefg"
+        val = CustomValuesModel.objects.create(custom_field=self.cf,
+                                               object_id=self.obj.pk,
+                                               value="abcdefg")
         val.save()
         self.assertEqual(repr(val), "<CustomValuesModel: text_field: abcdefg>")
 
@@ -126,8 +127,9 @@ class CustomModelsTestCase(TestCase):
         self.assertIn(self.cf, SimpleModelWithManager.get_model_custom_fields())
         self.assertEqual(self.cf, self.obj.get_custom_field('text_field'))
 
-        val = CustomValuesModel.objects.create(custom_field=self.cf, object_id=self.obj.pk)
-        val.value = "123456"
+        val = CustomValuesModel.objects.create(custom_field=self.cf,
+                                               object_id=self.obj.pk,
+                                               value="123456")
         val.save()
         self.assertEqual("123456", self.obj.get_custom_value('text_field'))
 
@@ -165,8 +167,8 @@ class CustomModelsTestCase(TestCase):
 
     def test_value_creation(self):
         val = CustomValuesModel.objects.create(custom_field=self.cf,
-                                               object_id=self.obj.pk)
-        val.value = "qwertyuiop"
+                                               object_id=self.obj.pk,
+                                               value="qwertyuiop")
         val.save()
         self.assertEqual(val.content_type, self.simple_with_manager_ct)
         self.assertEqual(val.content_type, val.custom_field.content_type)
@@ -178,14 +180,19 @@ class CustomModelsTestCase(TestCase):
         newobj.save()
 
         v1 = CustomValuesModel.objects.create(custom_field=self.cf,
-                                              object_id=self.obj.pk)
-        v1.value = "qwertyuiop"
+                                              object_id=self.obj.pk,
+                                              value="qwertyuiop")
         v1.save()
 
         v2 = CustomValuesModel.objects.create(custom_field=self.cf,
-                                              object_id=newobj.pk)
-        v2.value = "qwertyasdf"
+                                              object_id=newobj.pk,
+                                              value="qwertyuiop")
         v2.save()
+
+        v3 = CustomValuesModel.objects.create(custom_field=self.cf,
+                                              object_id=newobj.pk,
+                                              value="000asdf123")
+        v3.save()
 
         qs1 = SimpleModelWithManager.objects.search("asdf")
         self.assertQuerysetEqual(qs1, [repr(newobj)])
@@ -195,13 +202,13 @@ class CustomModelsTestCase(TestCase):
 
     def test_value_search_not_searchable_field(self):
         v1 = CustomValuesModel.objects.create(custom_field=self.cf,
-                                              object_id=self.obj.pk)
-        v1.value = "12345"
+                                              object_id=self.obj.pk,
+                                              value="12345")
         v1.save()
 
         v2 = CustomValuesModel.objects.create(custom_field=self.cf2,
-                                              object_id=self.obj.pk)
-        v2.value = "67890"
+                                              object_id=self.obj.pk,
+                                              value="67890")
         v2.save()
 
         qs1 = SimpleModelWithManager.objects.search("12345")

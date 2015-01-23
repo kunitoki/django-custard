@@ -34,7 +34,7 @@ them, for example when it's needed to maintain custom fields separation inside
 big apps.
 
 When an application makes use of a standard base model for all its models, like
-when subclassing from ``django_extensions.db.modelsTimeStampedModel``, Django
+when subclassing from ``django_extensions.db.models.TimeStampedModel``, Django
 Custard models can be constructed with a ``base_model`` class::
 
   from django.db import models
@@ -172,7 +172,7 @@ It's possible to create fields on the fly for any model and create::
 
   # Create a value for an instance of you model
   custom_value = CustomValuesModel.objects.create(custom_field=custom_field,
-                                                  object_id=Example.objects.get(pk=1).pk)
-  custom_value.value = "this is a custom value"
+                                                  object_id=Example.objects.get(pk=1).pk,
+                                                  value="this is a custom value")
   custom_value.save()
 

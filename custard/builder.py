@@ -143,6 +143,20 @@ class CustomFieldsBuilder(object):
 
         _builder = self
 
+        class CustomContentTypeFieldValueManager(models.Manager):
+            def create(self, **kwargs):
+                """
+                Sublcass create in order to be able to use "value" in kwargs
+                instead of using "value_%s" passing also type directly
+                """
+                if 'value' in kwargs:
+                    value = kwargs.pop('value')
+                    created_object = super(CustomContentTypeFieldValueManager, self).create(**kwargs)
+                    created_object.value = value
+                    return created_object
+                else:
+                    return super(CustomContentTypeFieldValueManager, self).create(**kwargs)
+
         @python_2_unicode_compatible
         class CustomContentTypeFieldValue(base_model):
             custom_field = models.ForeignKey('.'.join(_builder.fields_model),
@@ -161,6 +175,8 @@ class CustomFieldsBuilder(object):
             value_date = models.DateField(blank=True, null=True)
             value_datetime = models.DateTimeField(blank=True, null=True)
             value_boolean = models.NullBooleanField(blank=True)
+
+            objects = CustomContentTypeFieldValueManager()
 
             def _get_value(self):
                 return getattr(self, 'value_%s' % self.custom_field.data_type)
@@ -220,20 +236,22 @@ class CustomFieldsBuilder(object):
                 :return:
                 """
                 query = None
+                lookups = (
+                    '%s__%s' % ('value_text', 'icontains'),
+                )
                 content_type = ContentType.objects.get_for_model(self.model)
                 custom_args = dict({ 'content_type': content_type, 'searchable': True }, **custom_args)
                 custom_fields = dict((f.name, f) for f in _builder.fields_model_class.objects.filter(**custom_args))
-                for key, f in custom_fields.items():
-                    value_lookup = 'value_text'
-                    value_lookup = '%s__%s' % (value_lookup, 'icontains')
-                    found = _builder.values_model_class.objects.filter(**{ 'custom_field': f,
-                                                                           'content_type': content_type,
-                                                                           value_lookup: search_data })
-                    if found.count() > 0:
-                        if query is None:
-                            query = Q()
-                        query = query & Q(**{ str('%s__in' % self.model._meta.pk.name):
-                                              [obj.object_id for obj in found] })
+                for value_lookup in lookups:
+                    for key, f in custom_fields.items():
+                        found = _builder.values_model_class.objects.filter(**{ 'custom_field': f,
+                                                                               'content_type': content_type,
+                                                                               value_lookup: search_data })
+                        if found.count() > 0:
+                            if query is None:
+                                query = Q()
+                            query = query & Q(**{ str('%s__in' % self.model._meta.pk.name):
+                                                  [obj.object_id for obj in found] })
                 if query is None:
                     return self.get_queryset().none()
                 return self.get_queryset().filter(query)

@@ -7,6 +7,9 @@ Only important changes are mentioned below.
 v0.8 (unreleased)
 -----------------
 
+* Added ability to pass "value" in CustomValuesModel.objects.create
+* Fixed tests
+
 
 v0.7 (2014-07-29)
 -----------------

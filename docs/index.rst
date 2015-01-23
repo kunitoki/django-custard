@@ -30,6 +30,10 @@ Getting started
     class CustomValuesModel(builder.create_values()):
         pass
 
+4. Then sync your database with::
+
+    python manager.py syncdb
+
 
 Customization
 =============
