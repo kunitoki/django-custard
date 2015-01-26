@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from django.db import models
 from django.db.models import Q
 from django.db.models.loading import get_model
@@ -6,6 +7,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -19,7 +21,8 @@ from .utils import import_class
 #==============================================================================
 class CustomFieldsBuilder(object):
     """
-
+    The builder class is the core of django-custard.
+    From here it is possible to setup custom fields support for your models. 
     """
 
     #--------------------------------------------------------------------------
@@ -50,7 +53,7 @@ class CustomFieldsBuilder(object):
         return get_model(self.values_model[0], self.values_model[1])
 
     #--------------------------------------------------------------------------
-    def create_fields(self, base_model=models.Model):
+    def create_fields(self, base_model=models.Model, base_manager=models.Manager):
         """
         This method will create a model which will hold field types defined
         at runtime for each ContentType.
@@ -60,6 +63,9 @@ class CustomFieldsBuilder(object):
         """
 
         CONTENT_TYPES = self.content_types_query
+
+        class CustomContentTypeFieldManager(base_manager):
+            pass
 
         @python_2_unicode_compatible
         class CustomContentTypeField(base_model):
@@ -88,6 +94,8 @@ class CustomFieldsBuilder(object):
             max_length = models.PositiveIntegerField(_('max length'), blank=True, null=True)
             min_value = models.FloatField(_('min value'), blank=True, null=True)
             max_value = models.FloatField(_('max value'), blank=True, null=True)
+
+            objects = CustomContentTypeFieldManager()
 
             class Meta:
                 unique_together = ('content_type', 'name')
@@ -132,21 +140,22 @@ class CustomFieldsBuilder(object):
         return CustomContentTypeField
 
     #--------------------------------------------------------------------------
-    def create_values(self, base_model=models.Model):
+    def create_values(self, base_model=models.Model, base_manager=models.Manager):
         """
         This method will create a model which will hold field values for
         field types of custom_field_model.
 
         :param base_model:
+        :param base_manager:
         :return:
         """
 
         _builder = self
 
-        class CustomContentTypeFieldValueManager(models.Manager):
+        class CustomContentTypeFieldValueManager(base_manager):
             def create(self, **kwargs):
                 """
-                Sublcass create in order to be able to use "value" in kwargs
+                Subclass create in order to be able to use "value" in kwargs
                 instead of using "value_%s" passing also type directly
                 """
                 if 'value' in kwargs:

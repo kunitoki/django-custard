@@ -1,7 +1,5 @@
+from __future__ import unicode_literals
 import django
-#from django.conf import settings
-#from django.core.urlresolvers import reverse
-#from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
