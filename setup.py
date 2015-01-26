@@ -1,14 +1,14 @@
 from setuptools import setup
 
-from custard import __version__
+from custard import __author__, __version__, __license__, __email__
 
 setup(
     name='django-custard',
     version=__version__,
-    license='MIT',
+    license=__license__,
     url='https://github.com/kunitoki/django-custard',
-    author='Lucio Asnaghi (aka kunitoki)',
-    author_email='kunitoki@gmail.com',
+    author=__author__,
+    author_email=__email__,
     description='Django runtime typed custom fields for any model.',
     long_description=open('README.rst').read(),
     packages=[
