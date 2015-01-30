@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 from custard import __author__, __version__, __license__, __email__
 
@@ -7,17 +7,13 @@ setup(
     version=__version__,
     license=__license__,
     url='https://github.com/kunitoki/django-custard',
+    download_url='https://pypi.python.org/pypi/django-custard',
     author=__author__,
     author_email=__email__,
     description='Django runtime typed custom fields for any model.',
     long_description=open('README.rst').read(),
-    packages=[
-        'custard',
-        'custard.tests',
-    ],
-    package_data={
-        'custard': ['templates/custard/admin/*.html'],
-    },
+    packages=find_packages(),
+    include_package_data=True,
     install_requires=[
         "Django >= 1.6",
     ],
