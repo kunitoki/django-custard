@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import date, time, datetime
 import django
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -162,6 +163,77 @@ class CustomModelsTestCase(TestCase):
         val.value = "qwertyuiop"
         with self.assertRaises(ValidationError):
             val.full_clean()
+
+    def test_value_types_accessor(self):
+        val = CustomValuesModel.objects.create(custom_field=self.cf2,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf2,
+                                               object_id=self.obj.pk,
+                                               value="xxxxxxxxxxxxx")
+        val.save()
+        val = val.value
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf3,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf3,
+                                               object_id=self.obj.pk,
+                                               value=1)
+        val.save()
+        val = val.value
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf4,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf4,
+                                               object_id=self.obj.pk,
+                                               value=True)
+        val.save()
+        val = val.value
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf5,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf5,
+                                               object_id=self.obj.pk,
+                                               value=3.1456)
+        val.save()
+        val = val.value
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf6,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf6,
+                                               object_id=self.obj.pk,
+                                               value=date.today())
+        val.save()
+        val = val.value
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf7,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf7,
+                                               object_id=self.obj.pk,
+                                               value=datetime.now())
+        val.save()
+        val = val.value
+
+        val = CustomValuesModel.objects.create(custom_field=self.cf8,
+                                               object_id=self.obj.pk)
+        val.save()
+        val = val.value
+        val = CustomValuesModel.objects.create(custom_field=self.cf8,
+                                               object_id=self.obj.pk,
+                                               value=datetime.now().time())
+        val.save()
+        val = val.value
 
     def test_value_creation(self):
         val = CustomValuesModel.objects.create(custom_field=self.cf,
