@@ -3,11 +3,13 @@ Changelog
 
 Only important changes are mentioned below.
 
-v0.9 (unreleased)
+
+v0.9 (2015-03-12)
 -----------------
 
 * Added ability to pass "value" in CustomValuesModel.objects.create
-* Fixed tests
+* Fixed https://github.com/kunitoki/django-custard/pull/2
+* More tests and fixes
 
 
 v0.8 (2014-10-08)
