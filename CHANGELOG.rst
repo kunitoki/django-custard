@@ -4,6 +4,12 @@ Changelog
 Only important changes are mentioned below.
 
 
+v0.10 (unreleased)
+-----------------
+
+* Revert problem in mixin "get_custom_value" introduced with https://github.com/kunitoki/django-custard/commit/f3e171e6170d33a1ba6aba170e76549c55021ade
+
+
 v0.9 (2015-03-12)
 -----------------
 

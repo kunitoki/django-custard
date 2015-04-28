@@ -299,16 +299,15 @@ class CustomFieldsBuilder(object):
 
             def get_custom_value(self, field_name):
                 """ Get a value for a specified custom field """
-                custom_value, created = \
-                    _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
-                                                                      content_type=self._content_type,
-                                                                      object_id=self.pk)
-                return custom_value.value
+                return _builder.values_model_class.objects.get(custom_field__name=field_name,
+                                                               content_type=self._content_type,
+                                                               object_id=self.pk)
 
             def set_custom_value(self, field_name, value):
                 """ Set a value for a specified custom field """
                 custom_value, created = \
                     _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
+                                                                      content_type=self._content_type,
                                                                       object_id=self.pk)
                 custom_value.value = value
                 custom_value.full_clean()
