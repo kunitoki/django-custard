@@ -40,8 +40,17 @@ class CustomFieldsBuilder(object):
         self.fields_model = fields_model.split(".")
         self.values_model = values_model.split(".")
         self.custom_content_types = custom_content_types
-        self.content_types_query = Q(name__in=self.custom_content_types) \
-            if self.custom_content_types is not None else Q()
+        if self.custom_content_types and len(self.custom_content_types):
+            self.content_types_query = None
+            for c in self.custom_content_types:
+                model_tuple = c.split(".")
+                model_query = Q(app_label__in=model_tuple[0], model=model_tuple[1])
+                if self.content_types_query:
+                    self.content_types_query |= model_query
+                else:
+                    self.content_types_query = model_query
+        else:
+            self.content_types_query = Q()
 
     #--------------------------------------------------------------------------
     @property

@@ -108,7 +108,7 @@ class CustomModelsTestCase(TestCase):
         val.save()
         self.assertEqual(repr(val), "<CustomValuesModel: text_field: abcdefg>")
 
-    @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
+    @override_settings(CUSTOM_CONTENT_TYPES=['tests.SimpleModelWithManager'])
     def test_field_creation(self):
         builder2 = CustomFieldsBuilder('tests.CustomFieldsModel',
                                        'tests.CustomValuesModel',
@@ -119,7 +119,8 @@ class CustomModelsTestCase(TestCase):
                 app_label = 'tests'
 
         self.assertQuerysetEqual(ContentType.objects.filter(builder2.content_types_query),
-                                 ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
+                                 ContentType.objects.filter(Q(app_label__in=['tests'],
+                                                              model__in=['SimpleModelWithManager'])))
 
     def test_mixin(self):
         self.assertIn(self.cf, self.obj.get_custom_fields())
