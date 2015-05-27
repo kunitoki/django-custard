@@ -6,13 +6,8 @@ python:
   - 3.4
 env:
   - DJANGO=1.6.11
-<<<<<<< HEAD
   - DJANGO=1.7.8
   - DJANGO=1.8.2
-=======
-  - DJANGO=1.7.7
-  - DJANGO=1.8
->>>>>>> 6d12e9a4266de548bd230ec2b6905778356973c1
 before_install:
   - export DJANGO_SETTINGS_MODULE=custard.tests.settings
 install:
