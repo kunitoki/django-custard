@@ -12,31 +12,31 @@ fly: it's possible to create fields and set values for them from the code or
 manage them through the admin site, with the ability to display them even outside
 of the admin.
 
-.. |travis| image:: https://travis-ci.org/kunitoki/django-custard.png?branch=master
-   :alt: Build Status - master branch
-   :target: https://travis-ci.org/kunitoki/django-custard
-
-.. |coveralls| image:: https://coveralls.io/repos/kunitoki/django-custard/badge.png?branch=master
-   :alt: Source code coverage - master branch
-   :target: https://coveralls.io/r/kunitoki/django-custard
-
-.. |pythonversions| image:: https://pypip.in/py_versions/django-custard/badge.png
-    :target: https://pypi.python.org/pypi/django-custard/
-    :alt: Supported Python versions
-
-.. |pypi| image:: https://pypip.in/v/django-custard/badge.png
+.. |pypi| image:: https://img.shields.io/pypi/v/django-custard.svg
    :alt: Pypi latest version
    :target: https://pypi.python.org/pypi/django-custard/
 
-.. |downloads| image:: https://pypip.in/d/django-custard/badge.png
+.. |travis| image:: https://img.shields.io/travis/kunitoki/django-custard.svg
+   :alt: Build Status - master branch
+   :target: https://travis-ci.org/kunitoki/django-custard
+
+.. |coveralls| image:: https://img.shields.io/coveralls/kunitoki/django-custard.svg
+   :alt: Source code coverage - master branch
+   :target: https://coveralls.io/r/kunitoki/django-custard
+
+.. |requirements| image:: https://img.shields.io/requires/github/kunitoki/django-custard.svg
+    :alt: Python requirements
+    :target: https://pypi.python.org/pypi/django-custard/
+
+.. |downloads| image:: https://img.shields.io/pypi/dm/django-custard.svg
    :alt: Pypi downloads
    :target: https://pypi.python.org/pypi/django-custard/
 
-.. |license| image:: https://pypip.in/license/django-custard/badge.png
+.. |license| image:: https://img.shields.io/pypi/l/django-custard.svg
     :target: https://pypi.python.org/pypi/django-custard/
     :alt: License
 
-|pypi| |travis| |coveralls| |downloads| |pythonversions| |license|
+|pypi| |travis| |coveralls| |requirements| |downloads| |license|
 
 * Home page: https://github.com/kunitoki/django-custard
 * Documentation: http://django-custard.readthedocs.org
