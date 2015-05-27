@@ -1,5 +1,5 @@
 __author__ = "Lucio Asnaghi (aka kunitoki)"
-__version__ = "0.9"
+__version__ = "0.10"
 __copyright__ = "Copyright 2015, Asnaghi Lucio"
 __license__ = "MIT"
 __email__ = "kunitoki@gmail0.9com"

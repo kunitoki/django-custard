@@ -40,8 +40,17 @@ class CustomFieldsBuilder(object):
         self.fields_model = fields_model.split(".")
         self.values_model = values_model.split(".")
         self.custom_content_types = custom_content_types
-        self.content_types_query = Q(name__in=self.custom_content_types) \
-            if self.custom_content_types is not None else Q()
+        if self.custom_content_types and len(self.custom_content_types):
+            self.content_types_query = None
+            for c in self.custom_content_types:
+                model_tuple = c.split(".")
+                model_query = Q(app_label__in=model_tuple[0], model=model_tuple[1])
+                if self.content_types_query:
+                    self.content_types_query |= model_query
+                else:
+                    self.content_types_query = model_query
+        else:
+            self.content_types_query = Q()
 
     #--------------------------------------------------------------------------
     @property
@@ -299,16 +308,15 @@ class CustomFieldsBuilder(object):
 
             def get_custom_value(self, field_name):
                 """ Get a value for a specified custom field """
-                custom_value, created = \
-                    _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
-                                                                      content_type=self._content_type,
-                                                                      object_id=self.pk)
-                return custom_value.value
+                return _builder.values_model_class.objects.get(custom_field__name=field_name,
+                                                               content_type=self._content_type,
+                                                               object_id=self.pk)
 
             def set_custom_value(self, field_name, value):
                 """ Set a value for a specified custom field """
                 custom_value, created = \
                     _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
+                                                                      content_type=self._content_type,
                                                                       object_id=self.pk)
                 custom_value.value = value
                 custom_value.full_clean()

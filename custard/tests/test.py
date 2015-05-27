@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from datetime import date, time, datetime
 import django
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, Client
@@ -108,7 +108,7 @@ class CustomModelsTestCase(TestCase):
         val.save()
         self.assertEqual(repr(val), "<CustomValuesModel: text_field: abcdefg>")
 
-    @override_settings(CUSTOM_CONTENT_TYPES=['simplemodelwithmanager'])
+    @override_settings(CUSTOM_CONTENT_TYPES=['tests.SimpleModelWithManager'])
     def test_field_creation(self):
         builder2 = CustomFieldsBuilder('tests.CustomFieldsModel',
                                        'tests.CustomValuesModel',
@@ -119,21 +119,25 @@ class CustomModelsTestCase(TestCase):
                 app_label = 'tests'
 
         self.assertQuerysetEqual(ContentType.objects.filter(builder2.content_types_query),
-                                 ContentType.objects.filter(Q(name__in=['simplemodelwithmanager'])))
+                                 ContentType.objects.filter(Q(app_label__in=['tests'],
+                                                              model__in=['SimpleModelWithManager'])))
 
     def test_mixin(self):
         self.assertIn(self.cf, self.obj.get_custom_fields())
         self.assertIn(self.cf, SimpleModelWithManager.get_model_custom_fields())
         self.assertEqual(self.cf, self.obj.get_custom_field('text_field'))
 
+        with self.assertRaises(ObjectDoesNotExist):
+            self.obj.get_custom_value('non_existent_value')
+
         val = CustomValuesModel.objects.create(custom_field=self.cf,
                                                object_id=self.obj.pk,
                                                value="123456")
         val.save()
-        self.assertEqual("123456", self.obj.get_custom_value('text_field'))
+        self.assertEqual("123456", self.obj.get_custom_value('text_field').value)
 
         self.obj.set_custom_value('text_field', "abcdefg")
-        self.assertEqual("abcdefg", self.obj.get_custom_value('text_field'))
+        self.assertEqual("abcdefg", self.obj.get_custom_value('text_field').value)
 
         val.delete()
 
@@ -334,7 +338,7 @@ class CustomModelsTestCase(TestCase):
         form = TestForm(request.POST, instance=self.obj)
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual(self.obj.get_custom_value('another_text_field'), 'wwwzzzyyyxxx')
+        self.assertEqual(self.obj.get_custom_value('another_text_field').value, 'wwwzzzyyyxxx')
         self.assertEqual(self.obj.name, 'xxx')
 
         #self.assertInHTML(TestForm.custom_name, form.as_p())

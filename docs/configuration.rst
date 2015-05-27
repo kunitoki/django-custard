@@ -15,10 +15,10 @@ Configuration sample that can be used as a start::
   # Django Custard configuration example
 
   CUSTOM_CONTENT_TYPES = (
-    'mymodelname',
-    'myothermodelname',
-    'user',
-    'group',
+    'myapp.MyModelName',
+    'myotherapp.MyOtherModelName',
+    'auth.User',
+    'auth.Group',
   )
 
   CUSTOM_FIELD_TYPES = {
@@ -63,12 +63,11 @@ Parameters
 CUSTOM_CONTENT_TYPES
 ^^^^^^^^^^^^^^^^^^^^
 
-Select which content types will have custom fields, the name is the lower model
-name as it is available in ``ContentType.model`` field::
+Select which content types will have custom fields, the name is the
+``ContentType.app_label``.``ContentType.model``::
 
   CUSTOM_CONTENT_TYPES = (
-    'mymodelname',
-    'myothermodelname',
+    'app_label.ModelName',
   )
 
 
