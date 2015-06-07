@@ -22,7 +22,7 @@ from .utils import import_class
 class CustomFieldsBuilder(object):
     """
     The builder class is the core of django-custard.
-    From here it is possible to setup custom fields support for your models. 
+    From here it is possible to setup custom fields support for your models.
     """
 
     #--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class CustomFieldsBuilder(object):
             self.content_types_query = None
             for c in self.custom_content_types:
                 model_tuple = c.split(".")
-                model_query = Q(app_label__in=model_tuple[0], model=model_tuple[1])
+                model_query = Q(app_label=model_tuple[0], model=model_tuple[1])
                 if self.content_types_query:
                     self.content_types_query |= model_query
                 else:
