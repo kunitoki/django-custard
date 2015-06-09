@@ -7,6 +7,7 @@ Only important changes are mentioned below.
 v0.10 (unreleased)
 -----------------
 
+* Fixed a problem when custom_content_types is passed in CustomFieldsBuilder constructor (thanks to quamilek for the report)
 * Revert problem in mixin "get_custom_value" introduced with https://github.com/kunitoki/django-custard/commit/f3e171e6170d33a1ba6aba170e76549c55021ade
 
 
