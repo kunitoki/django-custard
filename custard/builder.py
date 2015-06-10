@@ -6,7 +6,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, NON_FIELD_ERRORS
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -323,6 +323,17 @@ class CustomFieldsBuilder(object):
                 custom_value.save()
                 return custom_value
 
+            def __getattr__(self, name):
+                """ Get a value for a specified custom field """
+                try:
+                    obj = _builder.values_model_class.objects.get(custom_field__name=name,
+                                                                  content_type=self._content_type,
+                                                                  object_id=self.pk)
+                    return obj.value
+                except ObjectDoesNotExist:
+                    pass
+                return super(CustomModelMixin, self).__getattr__(name)
+
         return CustomModelMixin
 
     #--------------------------------------------------------------------------
@@ -368,12 +379,10 @@ class CustomFieldsBuilder(object):
                 """
                 Save the form
                 """
-                self.instance = super(CustomFieldModelBaseForm, self).save(commit)
-                if self.instance:
+                self.instance = super(CustomFieldModelBaseForm, self).save(commit=commit)
+                if self.instance and commit:
                     self.instance.save()
-                if not self.instance.pk:
-                    raise Exception("Cannot create an object for some reason")
-                self.save_custom_fields()
+                    self.save_custom_fields()
                 return self.instance
 
             def init_custom_fields(self):
@@ -401,6 +410,9 @@ class CustomFieldsBuilder(object):
 
             def save_custom_fields(self):
                 """ Perform save and validation over the custom fields """
+                if not self.instance.pk:
+                    raise Exception("The model instance has not been saved. Have you called instance.save() ?")
+
                 content_type = self.get_content_type()
                 fields = self.get_fields_for_content_type(content_type)
                 for f in fields:

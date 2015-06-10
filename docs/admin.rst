@@ -75,6 +75,31 @@ Here is an example::
                                    value=value)
 
 
+When using this form with ``commit=False`` you have to take care of calling
+``save_custom_fields`` after you saved your model instance to save custom field
+values too, as they need an instance already in the database::
+
+  class ExampleForm(builder.create_modelform()):
+      class Meta:
+          model = Example
+
+  form = ExampleForm(request.POST, instance=example_object)
+  if form.is_valid():
+      # Do not hit the database
+      obj = form.save(commit=False)
+
+      # Do your logic here...
+
+      # Save the object to the database
+      obj.save()
+
+      # Save many to many as Django usual
+      form.save_m2m()
+
+      # Save the custom fields
+      form.save_custom_fields()
+
+
 ModelAdmin
 ----------
 

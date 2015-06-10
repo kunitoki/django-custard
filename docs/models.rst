@@ -76,7 +76,6 @@ interface to query and set fields and values::
   class CustomValuesModel(builder.create_values()):
       pass
 
-
 A number of methods are then added to your model:
 
 ``get_custom_fields(self)``
@@ -90,6 +89,32 @@ A number of methods are then added to your model:
 
 ``set_custom_value(self, field_name, value)``
     Set a value for a specified custom field
+
+
+Also it's possible to access custom fields like any other fields thanx to the
+``Mixin__getattr__`` implementation. This is legit::
+
+  # First obtain the content type
+  example_content_type = ContentType.objects.get_for_model(Example)
+
+  # Create a fields for the content type
+  custom_field = CustomFieldsModel.objects.create(content_type=example_content_type,
+                                                  data_type=CUSTOM_TYPE_TEXT,
+                                                  name='a_text_field',
+                                                  label='My field',
+                                                  searchable=True)
+  custom_field.save()
+
+  # Create an model instance
+  obj = Example(name='hello')
+  obj.save()
+
+  # Set a custom field value
+  obj.set_custom_value('a_text_field', 'world')
+
+  # Get fields from the model instance
+  print(obj.name) # This is a normal field
+  print(obj.a_text_field) # This is a custom field
 
 
 Manager

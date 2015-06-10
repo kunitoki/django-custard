@@ -334,12 +334,27 @@ class CustomModelsTestCase(TestCase):
 
         request = self.factory.post('/', { 'id': self.obj.pk,
                                            'name': 'xxx',
+                                           'text_field': '000111222333',
                                            'another_text_field': 'wwwzzzyyyxxx' })
         form = TestForm(request.POST, instance=self.obj)
         self.assertTrue(form.is_valid())
         form.save()
+        self.assertEqual(self.obj.get_custom_value('text_field').value, '000111222333')
         self.assertEqual(self.obj.get_custom_value('another_text_field').value, 'wwwzzzyyyxxx')
         self.assertEqual(self.obj.name, 'xxx')
+
+        request = self.factory.post('/', { 'id': self.obj.pk,
+                                           'name': 'aaa',
+                                           'another_text_field': 'qqqwwweeerrrtttyyyy'})
+        form = TestForm(request.POST, instance=self.obj)
+        self.assertTrue(form.is_valid())
+        obj = form.save(commit=False)
+        obj.save()
+        self.assertEqual(obj.another_text_field, 'wwwzzzyyyxxx')
+        form.save_m2m()
+        form.save_custom_fields()
+        self.assertEqual(obj.another_text_field, 'qqqwwweeerrrtttyyyy')
+        self.assertEqual(obj.name, 'aaa')
 
         #self.assertInHTML(TestForm.custom_name, form.as_p())
         #self.assertInHTML(TestForm.custom_description, form.as_p())
