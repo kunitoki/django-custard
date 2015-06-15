@@ -3,6 +3,11 @@ Changelog
 
 Only important changes are mentioned below.
 
+v0.11 (unreleased)
+-----------------
+
+* ...
+
 
 v0.10 (2015-06-15)
 -----------------
