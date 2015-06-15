@@ -91,8 +91,8 @@ A number of methods are then added to your model:
     Set a value for a specified custom field
 
 
-Also it's possible to access custom fields like any other fields thanx to the
-``Mixin__getattr__`` implementation. This is legit::
+Also it's possible to access custom fields like any other fields thanks to the
+``Mixin__getattr__`` implementation. Look at this example::
 
   # First obtain the content type
   example_content_type = ContentType.objects.get_for_model(Example)

@@ -41,7 +41,7 @@ custom ModelForm using ``builder.create_modelform``::
 
 It's possible to subclass the form and override 3 functions to specify even more
 the search for custom fields and values (for example when filtering with User
-or Group, so multiple cutom fields can be enable for each User or Group independently):
+or Group, so multiple custom fields can be enable for each User or Group independently):
 
 ``get_fields_for_content_type(self, content_type)``
     This function will return all fields defined for a specific content type
@@ -156,5 +156,4 @@ Django Custard modified version for search:
   {% block search %}
     {% include "custard/admin/search_form.html" %}
   {% endblock %}
-
 
