@@ -4,12 +4,12 @@ Changelog
 Only important changes are mentioned below.
 
 
-v0.10 (unreleased)
+v0.10 (2015-06-15)
 -----------------
 
 * Added Mixin.__getattr__ to access model custom fields like any other fields
 * Fixed a problem when using commit=False in ModelForms
-* Fixed a problem when custom_content_types is passed in CustomFieldsBuilder constructor (thanks to quamilek for the report)
+* Fixed a problem when custom_content_types is passed in CustomFieldsBuilder constructor (thanks to Kamil Wargula for the report and patch)
 * Revert problem in mixin "get_custom_value" introduced with https://github.com/kunitoki/django-custard/commit/f3e171e6170d33a1ba6aba170e76549c55021ade
 
 
