@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.db.models import Q
 from django import forms
-from django.db.models.loading import get_model
+from django.apps import apps
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -55,11 +55,11 @@ class CustomFieldsBuilder(object):
     #--------------------------------------------------------------------------
     @property
     def fields_model_class(self):
-        return get_model(self.fields_model[0], self.fields_model[1])
+        return apps.get_model(self.fields_model[0], self.fields_model[1])
 
     @property
     def values_model_class(self):
-        return get_model(self.values_model[0], self.values_model[1])
+        return apps.get_model(self.values_model[0], self.values_model[1])
 
     #--------------------------------------------------------------------------
     def create_fields(self, base_model=models.Model, base_manager=models.Manager):
