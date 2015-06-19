@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.db.models import Q
-from django.db.models.loading import get_model
 from django import forms
+from django.db.models.loading import get_model
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.exceptions import ObjectDoesNotExist, ValidationError, NON_FIELD_ERRORS
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
@@ -184,7 +184,7 @@ class CustomFieldsBuilder(object):
                                              verbose_name=_('content type'),
                                              limit_choices_to=_builder.content_types_query)
             object_id = models.PositiveIntegerField(_('object id'), db_index=True)
-            content_object = generic.GenericForeignKey('content_type', 'object_id')
+            content_object = GenericForeignKey('content_type', 'object_id')
 
             value_text = models.TextField(blank=True, null=True)
             value_integer = models.IntegerField(blank=True, null=True)

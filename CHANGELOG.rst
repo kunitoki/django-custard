@@ -6,7 +6,8 @@ Only important changes are mentioned below.
 v0.11 (unreleased)
 -----------------
 
-* ...
+* Dropped support for Django < 1.7 (insecure)
+* Dropped support for Python 3.2 and 3.3
 
 
 v0.10 (2015-06-15)
