@@ -16,7 +16,8 @@ from custard.builder import CustomFieldsBuilder
 from custard.utils import import_class
 
 from .models import (SimpleModelWithManager, SimpleModelWithoutManager,
-    CustomFieldsModel, CustomValuesModel, builder)
+    CustomFieldsModel, CustomValuesModel, builder,
+    SimpleModelUnique, CustomFieldsUniqueModel, CustomValuesUniqueModel, builder_unique)
 
 
 #==============================================================================
@@ -44,6 +45,7 @@ class CustomModelsTestCase(TestCase):
 
         self.simple_with_manager_ct = ContentType.objects.get_for_model(SimpleModelWithManager)
         self.simple_without_manager_ct = ContentType.objects.get_for_model(SimpleModelWithoutManager)
+        self.simple_unique = ContentType.objects.get_for_model(SimpleModelUnique)
 
         self.cf = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
                                                    name='text_field',
@@ -125,34 +127,40 @@ class CustomModelsTestCase(TestCase):
     def test_mixin(self):
         self.assertIn(self.cf, self.obj.get_custom_fields())
         self.assertIn(self.cf, SimpleModelWithManager.get_model_custom_fields())
-        self.assertEqual(self.cf, self.obj.get_custom_field('text_field'))
 
         with self.assertRaises(ObjectDoesNotExist):
-            self.obj.get_custom_value('non_existent_value')
+            self.obj.get_custom_value(self.cf2)
 
         val = CustomValuesModel.objects.create(custom_field=self.cf,
                                                object_id=self.obj.pk,
                                                value="123456")
         val.save()
-        self.assertEqual("123456", self.obj.get_custom_value('text_field').value)
+        self.assertEqual("123456", self.obj.get_custom_value(self.cf).value)
 
-        self.obj.set_custom_value('text_field', "abcdefg")
-        self.assertEqual("abcdefg", self.obj.get_custom_value('text_field').value)
+        self.obj.set_custom_value(self.cf, "abcdefg")
+        self.assertEqual("abcdefg", self.obj.get_custom_value(self.cf).value)
 
         val.delete()
 
     def test_field_model_clean(self):
-        cf = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
-                                              name='another_text_field',
-                                              label="Text field already present",
-                                              data_type=CUSTOM_TYPE_INTEGER)
+        cf = CustomFieldsUniqueModel.objects.create(content_type=self.simple_unique,
+                                                    name='xxx',
+                                                    label="Field not present anywhere",
+                                                    data_type=CUSTOM_TYPE_TEXT)
+        cf.full_clean()
+        cf.save()
+
+        cf = CustomFieldsUniqueModel.objects.create(content_type=self.simple_unique,
+                                                    name='xxx',
+                                                    label="Field already in custom fields",
+                                                    data_type=CUSTOM_TYPE_TEXT)
         with self.assertRaises(ValidationError):
             cf.full_clean()
 
-        cf = CustomFieldsModel.objects.create(content_type=self.simple_with_manager_ct,
-                                              name='name',
-                                              label="Text field already in model",
-                                              data_type=CUSTOM_TYPE_TEXT)
+        cf = CustomFieldsUniqueModel.objects.create(content_type=self.simple_unique,
+                                                    name='name',
+                                                    label="Field already present in model",
+                                                    data_type=CUSTOM_TYPE_INTEGER)
         with self.assertRaises(ValidationError):
             cf.full_clean()
 
@@ -339,8 +347,8 @@ class CustomModelsTestCase(TestCase):
         form = TestForm(request.POST, instance=self.obj)
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual(self.obj.get_custom_value('text_field').value, '000111222333')
-        self.assertEqual(self.obj.get_custom_value('another_text_field').value, 'wwwzzzyyyxxx')
+        self.assertEqual(self.obj.get_custom_value(self.cf).value, '000111222333')
+        self.assertEqual(self.obj.get_custom_value(self.cf2).value, 'wwwzzzyyyxxx')
         self.assertEqual(self.obj.name, 'xxx')
 
         request = self.factory.post('/', { 'id': self.obj.pk,
@@ -350,10 +358,10 @@ class CustomModelsTestCase(TestCase):
         self.assertTrue(form.is_valid())
         obj = form.save(commit=False)
         obj.save()
-        self.assertEqual(obj.another_text_field, 'wwwzzzyyyxxx')
+        self.assertEqual(self.obj.get_custom_value(self.cf2).value, 'wwwzzzyyyxxx')
         form.save_m2m()
         form.save_custom_fields()
-        self.assertEqual(obj.another_text_field, 'qqqwwweeerrrtttyyyy')
+        self.assertEqual(self.obj.get_custom_value(self.cf2).value, 'qqqwwweeerrrtttyyyy')
         self.assertEqual(obj.name, 'aaa')
 
         #self.assertInHTML(TestForm.custom_name, form.as_p())

@@ -81,18 +81,13 @@ A number of methods are then added to your model:
 ``get_custom_fields(self)``
     Return a list of custom fields for this model
 
-``get_custom_field(self, field_name)``
-    Get a custom field object for this model
-
-``get_custom_value(self, field_name)``
+``get_custom_value(self, field_object)``
     Get a value for a specified custom field
 
-``set_custom_value(self, field_name, value)``
+``set_custom_value(self, field_object, value)``
     Set a value for a specified custom field
 
-
-Also it's possible to access custom fields like any other fields thanks to the
-``Mixin__getattr__`` implementation. Look at this example::
+Look at this example::
 
   # First obtain the content type
   example_content_type = ContentType.objects.get_for_model(Example)
@@ -110,11 +105,7 @@ Also it's possible to access custom fields like any other fields thanks to the
   obj.save()
 
   # Set a custom field value
-  obj.set_custom_value('a_text_field', 'world')
-
-  # Get fields from the model instance
-  print(obj.name) # This is a normal field
-  print(obj.a_text_field) # This is a custom field
+  obj.set_custom_value(custom_field, 'world')
 
 
 Manager

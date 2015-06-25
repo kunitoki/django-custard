@@ -89,8 +89,8 @@ class CustomFieldsBuilder(object):
             )
 
             content_type = models.ForeignKey(ContentType,
-                                             related_name='custom_fields',
                                              verbose_name=_('content type'),
+                                             related_name='+',
                                              limit_choices_to=CONTENT_TYPES)
             name = models.CharField(_('name'), max_length=100, db_index=True)
             label = models.CharField(_('label'), max_length=100)
@@ -107,7 +107,6 @@ class CustomFieldsBuilder(object):
             objects = CustomContentTypeFieldManager()
 
             class Meta:
-                unique_together = ('content_type', 'name')
                 verbose_name = _('custom field')
                 verbose_name_plural = _('custom fields')
                 abstract = True
@@ -127,13 +126,13 @@ class CustomFieldsBuilder(object):
                     #    print obj
                     pass
 
-            def validate_unique(self, exclude=None):
-                # field name already defined in Model class
+            def _check_validate_already_defined_in_model(self):
                 model = self.content_type.model_class()
                 if self.name in [f.name for f in model._meta.fields]:
                     raise ValidationError({ 'name': (_('Custom field already defined as model field for content type %(model_name)s') % {'model_name': model.__name__},) })
 
-                # field name already defined in custom fields for content type
+            def _check_validate_already_defined_in_custom_fields(self):
+                model = self.content_type.model_class()
                 qs = self.__class__._default_manager.filter(
                     content_type=self.content_type,
                     name=self.name,
@@ -179,7 +178,7 @@ class CustomFieldsBuilder(object):
         class CustomContentTypeFieldValue(base_model):
             custom_field = models.ForeignKey('.'.join(_builder.fields_model),
                                              verbose_name=_('custom field'),
-                                             related_name='field')
+                                             related_name='+')
             content_type = models.ForeignKey(ContentType, editable=False,
                                              verbose_name=_('content type'),
                                              limit_choices_to=_builder.content_types_query)
@@ -301,21 +300,16 @@ class CustomFieldsBuilder(object):
                 """ Return a list of custom fields for this model """
                 return _builder.fields_model_class.objects.filter(content_type=self._content_type)
 
-            def get_custom_field(self, field_name):
-                """ Get a custom field object for this model """
-                return _builder.fields_model_class.objects.get(name=field_name,
-                                                               content_type=self._content_type)
-
-            def get_custom_value(self, field_name):
+            def get_custom_value(self, field):
                 """ Get a value for a specified custom field """
-                return _builder.values_model_class.objects.get(custom_field__name=field_name,
+                return _builder.values_model_class.objects.get(custom_field=field,
                                                                content_type=self._content_type,
                                                                object_id=self.pk)
 
-            def set_custom_value(self, field_name, value):
+            def set_custom_value(self, field, value):
                 """ Set a value for a specified custom field """
                 custom_value, created = \
-                    _builder.values_model_class.objects.get_or_create(custom_field__name=field_name,
+                    _builder.values_model_class.objects.get_or_create(custom_field=field,
                                                                       content_type=self._content_type,
                                                                       object_id=self.pk)
                 custom_value.value = value
@@ -323,16 +317,16 @@ class CustomFieldsBuilder(object):
                 custom_value.save()
                 return custom_value
 
-            def __getattr__(self, name):
-                """ Get a value for a specified custom field """
-                try:
-                    obj = _builder.values_model_class.objects.get(custom_field__name=name,
-                                                                  content_type=self._content_type,
-                                                                  object_id=self.pk)
-                    return obj.value
-                except ObjectDoesNotExist:
-                    pass
-                return super(CustomModelMixin, self).__getattr__(name)
+            #def __getattr__(self, name):
+            #    """ Get a value for a specified custom field """
+            #    try:
+            #        obj = _builder.values_model_class.objects.get(custom_field__name=name,
+            #                                                      content_type=self._content_type,
+            #                                                      object_id=self.pk)
+            #        return obj.value
+            #    except ObjectDoesNotExist:
+            #        pass
+            #    return super(CustomModelMixin, self).__getattr__(name)
 
         return CustomModelMixin
 

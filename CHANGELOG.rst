@@ -6,6 +6,7 @@ Only important changes are mentioned below.
 v0.11 (unreleased)
 -----------------
 
+* Removed validate_unique for fields so your subclass can decide what to do with fields with the same name
 * Dropped support for Django < 1.7 (insecure)
 * Dropped support for Python 3.2 and 3.3
 
