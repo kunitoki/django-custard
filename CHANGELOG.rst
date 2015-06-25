@@ -6,7 +6,10 @@ Only important changes are mentioned below.
 v0.11 (unreleased)
 -----------------
 
+* Fixed admin integration
+* Updated example project
 * Removed validate_unique for fields so your subclass can decide what to do with fields with the same name
+* Removed models.py (useless with Django>=1.7)
 * Dropped support for Django < 1.7 (insecure)
 * Dropped support for Python 3.2 and 3.3
 

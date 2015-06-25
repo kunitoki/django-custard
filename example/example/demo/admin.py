@@ -11,6 +11,7 @@ from .models import Example, CustomFieldsModel, CustomValuesModel, builder
 class ExampleForm(builder.create_modelform()):
     class Meta:
         model = Example
+        fields = '__all__'
 
 
 class ExampleAdmin(builder.create_modeladmin()):
@@ -33,6 +34,7 @@ class MyUserChangeForm(builder.create_modelform(base_form=UserChangeForm)):
 
     class Meta:
         model = User
+        fields = '__all__'
 
 class MyUserCreationForm(builder.create_modelform(base_form=UserCreationForm)):
     custom_name = 'Custom fields'
@@ -41,6 +43,7 @@ class MyUserCreationForm(builder.create_modelform(base_form=UserCreationForm)):
 
     class Meta:
         model = User
+        fields = '__all__'
 
 class MyUserAdmin(builder.create_modeladmin(base_admin=UserAdmin)):
     form = MyUserChangeForm

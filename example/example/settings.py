@@ -105,6 +105,6 @@ except ImportError:
 # Custard configuration
 
 CUSTOM_CONTENT_TYPES = (
-    'example',
-    'user',
+    'demo.example',
+    'auth.user',
 )
