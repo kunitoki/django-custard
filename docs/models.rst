@@ -53,61 +53,6 @@ Custard models can be constructed with a ``base_model`` class::
 Default for ``base_model`` is ``django.db.models.Model``.
 
 
-Mixin
------
-
-Custom fields and values attach to an application *real* models. To ease the
-interaction with custom fields, it's possible to attach a special model ``Mixin`` to
-any model for which it is possible to attach custom fields, and gain a simplified
-interface to query and set fields and values::
-
-  from django.db import models
-  from custard.builder import CustomFieldsBuilder
-
-  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
-  CustomMixin = builder.create_mixin()
-
-  class Example(models.Model, CustomMixin):
-      name = models.CharField(max_length=255)
-
-  class CustomFieldsModel(builder.create_fields()):
-      pass
-
-  class CustomValuesModel(builder.create_values()):
-      pass
-
-A number of methods are then added to your model:
-
-``get_custom_fields(self)``
-    Return a list of custom fields for this model
-
-``get_custom_value(self, field_object)``
-    Get a value for a specified custom field
-
-``set_custom_value(self, field_object, value)``
-    Set a value for a specified custom field
-
-Look at this example::
-
-  # First obtain the content type
-  example_content_type = ContentType.objects.get_for_model(Example)
-
-  # Create a fields for the content type
-  custom_field = CustomFieldsModel.objects.create(content_type=example_content_type,
-                                                  data_type=CUSTOM_TYPE_TEXT,
-                                                  name='a_text_field',
-                                                  label='My field',
-                                                  searchable=True)
-  custom_field.save()
-
-  # Create an model instance
-  obj = Example(name='hello')
-  obj.save()
-
-  # Set a custom field value
-  obj.set_custom_value(custom_field, 'world')
-
-
 Manager
 -------
 
@@ -168,7 +113,7 @@ manager will then inherit from that base class::
 Using the models
 ----------------
 
-It's possible to create fields on the fly for any model and create::
+It's possible to create fields on the fly for any model::
 
   from django.contrib.contenttypes.models import ContentType
   from custard.conf import CUSTOM_TYPE_TEXT
@@ -191,4 +136,59 @@ It's possible to create fields on the fly for any model and create::
                                                   object_id=Example.objects.get(pk=1).pk,
                                                   value="this is a custom value")
   custom_value.save()
+
+
+Mixin
+-----
+
+Custom fields and values attach to an application *real* models. To ease the
+interaction with custom fields, it's possible to attach a special model ``Mixin`` to
+any model for which it is possible to attach custom fields, and gain a simplified
+interface to query and set fields and values::
+
+  from django.db import models
+  from custard.builder import CustomFieldsBuilder
+
+  builder = CustomFieldsBuilder('myapp.CustomFieldsModel', 'myapp.CustomValuesModel')
+  CustomMixin = builder.create_mixin()
+
+  class Example(models.Model, CustomMixin):
+      name = models.CharField(max_length=255)
+
+  class CustomFieldsModel(builder.create_fields()):
+      pass
+
+  class CustomValuesModel(builder.create_values()):
+      pass
+
+A number of methods are then added to your model:
+
+``get_custom_fields(self)``
+    Return a list of custom fields for this model
+
+``get_custom_value(self, field_object)``
+    Get a value for a specified custom field
+
+``set_custom_value(self, field_object, value)``
+    Set a value for a specified custom field
+
+Look at this example::
+
+  # First obtain the content type
+  example_content_type = ContentType.objects.get_for_model(Example)
+
+  # Create a fields for the content type
+  custom_field = CustomFieldsModel.objects.create(content_type=example_content_type,
+                                                  data_type=CUSTOM_TYPE_TEXT,
+                                                  name='a_text_field',
+                                                  label='My field',
+                                                  searchable=True)
+  custom_field.save()
+
+  # Create an model instance
+  obj = Example(name='hello')
+  obj.save()
+
+  # Set a custom field value
+  obj.set_custom_value(custom_field, 'world')
 
