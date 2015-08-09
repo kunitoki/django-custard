@@ -565,3 +565,9 @@ class CustomFieldsBuilder(object):
                     form.save_custom_fields()
 
         return CustomFieldModelBaseAdmin
+
+
+#===============================================================================
+# This class is an empty class to avoid migrations errors
+class CustomModelMixin(object):
+    pass
